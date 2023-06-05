@@ -6,3 +6,4 @@ backups
 *.db-*
 .storage
 blueprints
+secrets.yaml
