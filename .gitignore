@@ -1,0 +1,8 @@
+.HA_VERSION
+backups
+*.log
+*.log.*
+*.db
+*.db-*
+.storage
+blueprints

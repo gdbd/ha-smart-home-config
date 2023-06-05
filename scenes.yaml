@@ -1,0 +1,362 @@
+- id: '1680505027421'
+  name: Все выключатели и реле
+  entities:
+    switch.vannaia_pol:
+      consumption: 32.98
+      current: 0
+      device_temperature: 24
+      energy: 32.98
+      last_seen: '2023-05-17T20:13:51+03:00'
+      led_disabled_night:
+      linkquality: 171
+      power: 0
+      power_outage_count: 1
+      power_outage_memory:
+      switch_type: toggle
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      voltage: 233.01
+      friendly_name: Ванная пол
+      state: 'off'
+    switch.gostinaia_2_klavishi_left:
+      action:
+      device_temperature: 23
+      flip_indicator_light: 'OFF'
+      last_seen: '2023-05-17T20:11:53+03:00'
+      linkquality: 171
+      mode_switch: quick_mode
+      operation_mode_left: control_relay
+      operation_mode_right: control_relay
+      power_outage_count: 4
+      power_outage_memory:
+      state_left: 'OFF'
+      state_right: 'OFF'
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      friendly_name: Гостиная 2 клавиши left
+      state: 'off'
+    switch.gostinaia_2_klavishi_right:
+      action:
+      device_temperature: 23
+      flip_indicator_light: 'OFF'
+      last_seen: '2023-05-17T20:11:53+03:00'
+      linkquality: 171
+      mode_switch: quick_mode
+      operation_mode_left: control_relay
+      operation_mode_right: control_relay
+      power_outage_count: 4
+      power_outage_memory:
+      state_left: 'OFF'
+      state_right: 'OFF'
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      friendly_name: Гостиная 2 клавиши right
+      state: 'off'
+    select.gostinaia_2_klavishi_mode_switch:
+      options:
+      - anti_flicker_mode
+      - quick_mode
+      action:
+      device_temperature: 23
+      flip_indicator_light: 'OFF'
+      last_seen: '2023-05-17T20:11:53+03:00'
+      linkquality: 171
+      mode_switch: quick_mode
+      operation_mode_left: control_relay
+      operation_mode_right: control_relay
+      power_outage_count: 4
+      power_outage_memory:
+      state_left: 'OFF'
+      state_right: 'OFF'
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      friendly_name: Гостиная 2 клавиши mode switch
+      state: quick_mode
+    switch.detskaia_2_klavishi_left:
+      action: ''
+      device_temperature: 25
+      flip_indicator_light:
+      last_seen: '2023-05-17T20:18:16+03:00'
+      linkquality: 171
+      mode_switch: quick_mode
+      operation_mode_left: control_relay
+      operation_mode_right: control_relay
+      power_outage_count: 3
+      power_outage_memory:
+      state_left: 'OFF'
+      state_right: 'ON'
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      friendly_name: Детская 2 клавиши left
+      state: 'off'
+    switch.detskaia_2_klavishi_right:
+      action: ''
+      device_temperature: 25
+      flip_indicator_light:
+      last_seen: '2023-05-17T20:18:16+03:00'
+      linkquality: 171
+      mode_switch: quick_mode
+      operation_mode_left: control_relay
+      operation_mode_right: control_relay
+      power_outage_count: 3
+      power_outage_memory:
+      state_left: 'OFF'
+      state_right: 'ON'
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      friendly_name: Детская 2 клавиши right
+      state: 'on'
+    select.detskaia_2_klavishi_mode_switch:
+      options:
+      - anti_flicker_mode
+      - quick_mode
+      action: ''
+      device_temperature: 25
+      flip_indicator_light:
+      last_seen: '2023-05-17T20:18:16+03:00'
+      linkquality: 171
+      mode_switch: quick_mode
+      operation_mode_left: control_relay
+      operation_mode_right: control_relay
+      power_outage_count: 3
+      power_outage_memory:
+      state_left: 'OFF'
+      state_right: 'ON'
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      friendly_name: Детская 2 клавиши mode switch
+      state: quick_mode
+    switch.kukhnia_2_klavishi_left:
+      action:
+      device_temperature: 26
+      flip_indicator_light:
+      last_seen: '2023-05-17T20:18:13+03:00'
+      linkquality: 171
+      mode_switch: quick_mode
+      operation_mode_left: control_relay
+      operation_mode_right: control_relay
+      power_outage_count: 2
+      power_outage_memory:
+      state_left: 'OFF'
+      state_right: 'OFF'
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      friendly_name: Кухня 2 клавиши left
+      state: 'off'
+    switch.kukhnia_2_klavishi_right:
+      action:
+      device_temperature: 26
+      flip_indicator_light:
+      last_seen: '2023-05-17T20:18:13+03:00'
+      linkquality: 171
+      mode_switch: quick_mode
+      operation_mode_left: control_relay
+      operation_mode_right: control_relay
+      power_outage_count: 2
+      power_outage_memory:
+      state_left: 'OFF'
+      state_right: 'OFF'
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      friendly_name: Кухня 2 клавиши right
+      state: 'off'
+    select.kukhnia_2_klavishi_mode_switch:
+      options:
+      - anti_flicker_mode
+      - quick_mode
+      action:
+      device_temperature: 26
+      flip_indicator_light:
+      last_seen: '2023-05-17T20:18:13+03:00'
+      linkquality: 171
+      mode_switch: quick_mode
+      operation_mode_left: control_relay
+      operation_mode_right: control_relay
+      power_outage_count: 2
+      power_outage_memory:
+      state_left: 'OFF'
+      state_right: 'OFF'
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      friendly_name: Кухня 2 клавиши mode switch
+      state: quick_mode
+    switch.0x54ef44100050f803:
+      action:
+      device_temperature: 26
+      flip_indicator_light: 'OFF'
+      last_seen: '2023-05-17T20:17:58+03:00'
+      linkquality: 87
+      mode_switch: quick_mode
+      operation_mode: control_relay
+      power_outage_count: 2
+      power_outage_memory:
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      friendly_name: Кухня подсветка
+      state: 'on'
+    select.0x54ef44100050f803_mode_switch:
+      options:
+      - anti_flicker_mode
+      - quick_mode
+      action:
+      device_temperature: 26
+      flip_indicator_light: 'OFF'
+      last_seen: '2023-05-17T20:17:58+03:00'
+      linkquality: 87
+      mode_switch: quick_mode
+      operation_mode: control_relay
+      power_outage_count: 2
+      power_outage_memory:
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      friendly_name: Кухня подсветка mode switch
+      state: quick_mode
+    switch.prikhozhaia_vkhod:
+      action:
+      device_temperature: 27
+      flip_indicator_light:
+      last_seen: '2023-05-17T20:13:34+03:00'
+      linkquality: 193
+      mode_switch: quick_mode
+      operation_mode: decoupled
+      power_outage_count: 1
+      power_outage_memory:
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      friendly_name: Прихожая вход
+      state: 'off'
+    select.prikhozhaia_vkhod_mode_switch:
+      options:
+      - anti_flicker_mode
+      - quick_mode
+      action:
+      device_temperature: 27
+      flip_indicator_light:
+      last_seen: '2023-05-17T20:13:34+03:00'
+      linkquality: 193
+      mode_switch: quick_mode
+      operation_mode: decoupled
+      power_outage_count: 1
+      power_outage_memory:
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      friendly_name: Прихожая вход mode switch
+      state: quick_mode
+    switch.prikhozhaia_prokhod:
+      action:
+      device_temperature: 27
+      flip_indicator_light:
+      last_seen: '2023-05-17T20:12:49+03:00'
+      linkquality: 171
+      mode_switch: quick_mode
+      operation_mode: decoupled
+      power_outage_count: 1372
+      power_outage_memory:
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      friendly_name: Прихожая проход
+      state: 'off'
+    select.prikhozhaia_prokhod_mode_switch:
+      options:
+      - anti_flicker_mode
+      - quick_mode
+      action:
+      device_temperature: 27
+      flip_indicator_light:
+      last_seen: '2023-05-17T20:12:49+03:00'
+      linkquality: 171
+      mode_switch: quick_mode
+      operation_mode: decoupled
+      power_outage_count: 1372
+      power_outage_memory:
+      update:
+        installed_version: -1
+        latest_version: -1
+        state:
+      update_available:
+      friendly_name: Прихожая проход mode switch
+      state: quick_mode
+    switch.tualet_vytiazhka:
+      last_seen: '2023-05-17T20:10:47+03:00'
+      linkquality: 91
+      power_on_behavior: 'off'
+      friendly_name: Туалет вытяжка
+      state: 'off'
+    light.tualet_svet:
+      supported_color_modes:
+      - brightness
+      last_seen: '2023-05-17T20:16:56+03:00'
+      light_type:
+      linkquality: 131
+      max_brightness: 255
+      min_brightness: 4
+      power_on_behavior:
+      friendly_name: Туалет свет
+      supported_features: 40
+      state: 'off'
+    select.tualet_svet_light_type:
+      options:
+      - led
+      - incandescent
+      - halogen
+      brightness: 230
+      last_seen: '2023-05-17T20:16:56+03:00'
+      light_type:
+      linkquality: 131
+      max_brightness: 255
+      min_brightness: 4
+      power_on_behavior:
+      friendly_name: Туалет свет light type
+      state: unknown
+  icon: mdi:light-switch-off
+  metadata: {}
+- id: '1680505142404'
+  name: Все датчики двиджения
+  entities: {}
+  icon: mdi:motion-sensor
+  metadata: {}

@@ -1,0 +1,9 @@
+test_script:
+  alias: Скрипт включить все
+  sequence:
+  - service: scene.turn_on
+    target:
+      entity_id: scene.vse_vykliuchateli_i_rele
+    metadata: {}
+  mode: single
+  icon: mdi:script
