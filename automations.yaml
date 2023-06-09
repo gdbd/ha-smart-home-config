@@ -1402,3 +1402,129 @@
     entity_id: switch.detskaia_2_klavishi_left
     domain: switch
   mode: single
+- id: '1686339484617'
+  alias: Охрана
+  description: ''
+  trigger:
+  - type: motion
+    platform: device
+    device_id: 384bc5de06080550d181e3a1f14001c4
+    entity_id: binary_sensor.kukhnia_dvizhenie_occupancy
+    domain: binary_sensor
+  - type: motion
+    platform: device
+    device_id: c269c13ef41882b58e9d63e33f96484f
+    entity_id: binary_sensor.prikhozhaia_dvizhenie_dver_occupancy
+    domain: binary_sensor
+  - type: motion
+    platform: device
+    device_id: ed407103a3f18dad945d48213cc8b193
+    entity_id: binary_sensor.prikhozhaia_dvizhenie_vkhod_occupancy
+    domain: binary_sensor
+  - type: motion
+    platform: device
+    device_id: 8d82e44094c7bbf69f740df9af6531d6
+    entity_id: binary_sensor.prikhozhaia_dvizhenie_prokhod_occupancy
+    domain: binary_sensor
+  - type: motion
+    platform: device
+    device_id: ea74710bfbc16a3895f5a58d03219a53
+    entity_id: binary_sensor.vannaia_dvizhenie_occupancy
+    domain: binary_sensor
+  - type: motion
+    platform: device
+    device_id: 70352209ac0baa1903d206e757e47588
+    entity_id: binary_sensor.tualet_dvizhenie_occupancy
+    domain: binary_sensor
+  - type: opened
+    platform: device
+    device_id: f33886c6b2db3c0d2389e8df6237d397
+    entity_id: binary_sensor.vkhodnaia_dver_contact
+    domain: binary_sensor
+  - type: opened
+    platform: device
+    device_id: fe4aea95bdeb8772c679f823a4e54144
+    entity_id: binary_sensor.tualet_dver_contact
+    domain: binary_sensor
+  - type: opened
+    platform: device
+    device_id: 0b8a16f793e932eaa5160bd857c62c82
+    entity_id: binary_sensor.vannaia_dver_contact
+    domain: binary_sensor
+  - platform: device
+    domain: mqtt
+    device_id: de32a39e975899dd8088d80dac8b0c8e
+    type: action
+    subtype: single
+    discovery_id: 0x54ef4410005c41e9 action_single
+  - platform: device
+    domain: mqtt
+    device_id: 6f7bf8bd4233f103ce913b5e82c7ef0a
+    type: action
+    subtype: single
+    discovery_id: 0x54ef44100059a06f action_single
+  - platform: device
+    type: changed_states
+    device_id: 1caa9e19608f785cb00d0e179a7037b6
+    entity_id: light.vannaia_svet
+    domain: light
+  - platform: device
+    type: changed_states
+    device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
+    entity_id: light.tualet_svet
+    domain: light
+  - platform: device
+    domain: mqtt
+    device_id: 97e0615b18f94d252b3d76007d46c665
+    type: action
+    subtype: single_left
+    discovery_id: 0x54ef4410004db255 action_single_left
+  - platform: device
+    domain: mqtt
+    device_id: 97e0615b18f94d252b3d76007d46c665
+    type: action
+    subtype: double_right
+    discovery_id: 0x54ef4410004db255 action_double_right
+  - platform: device
+    domain: mqtt
+    device_id: 0766f4988b021902a3cbf1c54c91b469
+    type: action
+    subtype: single_right
+    discovery_id: 0x54ef4410004e7321 action_single_right
+  - platform: device
+    domain: mqtt
+    device_id: 0766f4988b021902a3cbf1c54c91b469
+    type: action
+    subtype: single_left
+    discovery_id: 0x54ef4410004e7321 action_single_left
+  - platform: device
+    domain: mqtt
+    device_id: ec3fd6bdfe8c439ad6599a7a82935eaa
+    type: action
+    subtype: single_right
+    discovery_id: 0x54ef4410004e73e8 action_single_right
+  - platform: device
+    domain: mqtt
+    device_id: ec3fd6bdfe8c439ad6599a7a82935eaa
+    type: action
+    subtype: single_left
+    discovery_id: 0x54ef4410004e73e8 action_single_left
+  - platform: device
+    domain: mqtt
+    device_id: cea131d0cc56c10c9c8aec6c27c41830
+    type: action
+    subtype: single
+    discovery_id: 0x54ef44100050f803 action_single
+  condition: []
+  action:
+  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+    domain: mobile_app
+    type: notify
+    message: '{{ states(''input_number.securitycounter'')  }}'
+    title: 'охрана: тревога!'
+    enabled: true
+  - service: input_number.increment
+    data: {}
+    target:
+      entity_id: input_number.securitycounter
+  mode: single

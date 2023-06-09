@@ -7,3 +7,5 @@ backups
 .storage
 blueprints
 secrets.yaml
+custom_components
+www
