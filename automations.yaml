@@ -632,12 +632,6 @@
   alias: 'Туалет свет выключен: включить вытяжку'
   description: ''
   trigger:
-  - platform: device
-    type: turned_off
-    device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
-    entity_id: light.tualet_svet
-    domain: light
-    enabled: false
   - platform: state
     entity_id:
     - light.tualet_svet
@@ -860,12 +854,6 @@
   alias: 'Ванная дверь: открыто - включить свет'
   description: ''
   trigger:
-  - type: opened
-    platform: device
-    device_id: 0b8a16f793e932eaa5160bd857c62c82
-    entity_id: binary_sensor.vannaia_dver_contact
-    domain: binary_sensor
-    enabled: false
   - platform: state
     entity_id:
     - binary_sensor.vannaia_dver_contact
@@ -1414,6 +1402,15 @@
         entity_id: device_tracker.pixel_5
         type: is_home
       sequence:
+      - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+        domain: mobile_app
+        type: notify
+        message: Охрана 5 мин до выключения
+      - delay:
+          hours: 0
+          minutes: 5
+          seconds: 0
+          milliseconds: 0
       - service: automation.turn_off
         data:
           stop_actions: true
