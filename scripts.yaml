@@ -1,9 +1,113 @@
-test_script:
-  alias: Скрипт включить все
+motion_closed:
+  alias: Скрипт движение c закрытием
   sequence:
-  - service: scene.turn_on
+  - service: logbook.log
+    data:
+      name: move
+      message: START, OPEN, SET VAR
+      entity_id: automation.left
+  - service: input_boolean.turn_on
+    data: {}
     target:
-      entity_id: scene.vse_vykliuchateli_i_rele
-    metadata: {}
+      entity_id: input_boolean.toilet_was_movement_inside
+  - wait_for_trigger:
+    - type: not_opened
+      platform: device
+      device_id: fe4aea95bdeb8772c679f823a4e54144
+      entity_id: binary_sensor.tualet_dver_contact
+      domain: binary_sensor
+  - service: logbook.log
+    data:
+      name: move
+      message: CLOSED, WAIT MOTION
+      entity_id: automation.left
+  - wait_template: '{{ is_state(''binary_sensor.tualet_dvizhenie_occupancy'', ''on'')
+      }}'
+    continue_on_timeout: true
+  - service: logbook.log
+    data:
+      name: move
+      message: FOUND MOTION, WAIT OPEN
+      entity_id: automation.left
+  - wait_for_trigger:
+    - type: opened
+      platform: device
+      device_id: fe4aea95bdeb8772c679f823a4e54144
+      entity_id: binary_sensor.tualet_dver_contact
+      domain: binary_sensor
+  - service: logbook.log
+    data:
+      name: move
+      message: OPENED, WAIT CLOSED
+      entity_id: automation.left
+  - wait_for_trigger:
+    - type: not_opened
+      platform: device
+      device_id: fe4aea95bdeb8772c679f823a4e54144
+      entity_id: binary_sensor.tualet_dver_contact
+      domain: binary_sensor
+  - service: logbook.log
+    data:
+      name: move
+      message: CLOSED, OFF LIGHT
+      entity_id: automation.left
+  - type: turn_off
+    device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
+    entity_id: light.tualet_svet
+    domain: light
+  - service: input_boolean.turn_off
+    data: {}
+    target:
+      entity_id: input_boolean.toilet_was_movement_inside
+  - service: logbook.log
+    data:
+      name: move
+      message: OFF BOOLEAN, END
+      entity_id: automation.left
   mode: single
-  icon: mdi:script
+  icon: mdi:motion-sensor
+motion_open:
+  alias: Скрипт движение без закрытия
+  sequence:
+  - service: logbook.log
+    data:
+      name: move
+      message: START, OPEN, SET VAR
+      entity_id: automation.left
+  - service: input_boolean.turn_on
+    data: {}
+    target:
+      entity_id: input_boolean.toilet_was_movement_inside
+  - wait_template: '{{ is_state(''binary_sensor.tualet_dvizhenie_occupancy'', ''on'')
+      }}'
+    continue_on_timeout: true
+  - service: logbook.log
+    data:
+      name: move
+      message: HAS MOTION, WAIT CLOSED
+      entity_id: automation.left
+  - wait_for_trigger:
+    - type: not_opened
+      platform: device
+      device_id: fe4aea95bdeb8772c679f823a4e54144
+      entity_id: binary_sensor.tualet_dver_contact
+      domain: binary_sensor
+  - service: logbook.log
+    data:
+      name: move
+      message: CLOSED, OFF LIGHT
+      entity_id: automation.left
+  - type: turn_off
+    device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
+    entity_id: light.tualet_svet
+    domain: light
+  - service: input_boolean.turn_off
+    data: {}
+    target:
+      entity_id: input_boolean.toilet_was_movement_inside
+  - service: logbook.log
+    data:
+      name: move
+      message: OFF BOOLEAN, END
+      entity_id: automation.left
+  mode: restart

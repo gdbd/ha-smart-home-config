@@ -637,6 +637,12 @@
     device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
     entity_id: light.tualet_svet
     domain: light
+    enabled: false
+  - platform: state
+    entity_id:
+    - light.tualet_svet
+    from: 'on'
+    to: 'off'
   condition:
   - condition: state
     entity_id: timer.taimer_tualet_svet
@@ -859,6 +865,12 @@
     device_id: 0b8a16f793e932eaa5160bd857c62c82
     entity_id: binary_sensor.vannaia_dver_contact
     domain: binary_sensor
+    enabled: false
+  - platform: state
+    entity_id:
+    - binary_sensor.vannaia_dver_contact
+    from: 'off'
+    to: 'on'
   condition:
   - condition: device
     type: is_off
@@ -917,100 +929,9 @@
     entity_id: input_boolean.toilet_was_movement_inside
     state: 'off'
   action:
-  - service: logbook.log
-    data:
-      name: move
-      message: START
-      entity_id: automation.left
-  - wait_for_trigger:
-    - type: not_opened
-      platform: device
-      device_id: fe4aea95bdeb8772c679f823a4e54144
-      entity_id: binary_sensor.tualet_dver_contact
-      domain: binary_sensor
-  - service: logbook.log
-    data:
-      name: move
-      message: CLOSED, WAIT BEFORE
-      entity_id: automation.left
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 3
-      milliseconds: 0
-    enabled: true
-  - service: logbook.log
-    data:
-      name: move
-      message: CLOSED, WAIT AFTER
-      entity_id: automation.left
-  - wait_for_trigger:
-    - type: motion
-      platform: device
-      device_id: 70352209ac0baa1903d206e757e47588
-      entity_id: binary_sensor.tualet_dvizhenie_occupancy
-      domain: binary_sensor
-    timeout:
-      hours: 0
-      minutes: 0
-      seconds: 0
-      milliseconds: 0
-    continue_on_timeout: true
-  - service: logbook.log
-    data:
-      name: move
-      message: FOUND MOTION, DELAY BEFORE
-      entity_id: automation.left
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 3
-      milliseconds: 0
-    enabled: true
-  - service: logbook.log
-    data:
-      name: move
-      message: DELAY AFTER
-      entity_id: automation.left
-  - service: input_boolean.turn_on
+  - service: script.motion_closed
     data: {}
-    target:
-      entity_id: input_boolean.toilet_was_movement_inside
-  - service: logbook.log
-    data:
-      name: move
-      message: VAR WAS SET, END
-      entity_id: automation.left
   mode: restart
-- id: '1685341286738'
-  alias: 'Туалет дверь закрыта: выключить свет'
-  description: ''
-  trigger:
-  - type: not_opened
-    platform: device
-    device_id: fe4aea95bdeb8772c679f823a4e54144
-    entity_id: binary_sensor.tualet_dver_contact
-    domain: binary_sensor
-  condition:
-  - condition: state
-    entity_id: input_boolean.toilet_was_movement_inside
-    state: 'on'
-  - condition: device
-    type: is_on
-    device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
-    entity_id: light.tualet_svet
-    domain: light
-  action:
-  - type: turn_off
-    device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
-    entity_id: light.tualet_svet
-    domain: light
-  - service: logbook.log
-    data:
-      name: door close
-      message: OFF BY CLOSE WITH MOTION INSIDE
-      entity_id: automation.left
-  mode: single
 - id: '1685341713816'
   alias: Кухня дубль удержание
   description: ''
@@ -1290,84 +1211,6 @@
         domain: light
         brightness_pct: 30
   mode: single
-- id: '1685994061633'
-  alias: Туалет движение после закрытия v2
-  description: ''
-  trigger:
-  - type: opened
-    platform: device
-    device_id: fe4aea95bdeb8772c679f823a4e54144
-    entity_id: binary_sensor.tualet_dver_contact
-    domain: binary_sensor
-  condition:
-  - condition: state
-    entity_id: input_boolean.toilet_was_movement_inside
-    state: 'off'
-  action:
-  - service: logbook.log
-    data:
-      name: move
-      message: START, OPEN, SET VAR
-      entity_id: automation.left
-  - service: input_boolean.turn_on
-    data: {}
-    target:
-      entity_id: input_boolean.toilet_was_movement_inside
-  - wait_for_trigger:
-    - type: not_opened
-      platform: device
-      device_id: fe4aea95bdeb8772c679f823a4e54144
-      entity_id: binary_sensor.tualet_dver_contact
-      domain: binary_sensor
-  - service: logbook.log
-    data:
-      name: move
-      message: CLOSED, WAIT MOTION
-      entity_id: automation.left
-  - wait_template: '{{ is_state(''binary_sensor.tualet_dvizhenie_occupancy'', ''on'')
-      }}'
-    continue_on_timeout: true
-  - service: logbook.log
-    data:
-      name: move
-      message: FOUND MOTION, WAIT OPEN
-      entity_id: automation.left
-  - wait_for_trigger:
-    - type: opened
-      platform: device
-      device_id: fe4aea95bdeb8772c679f823a4e54144
-      entity_id: binary_sensor.tualet_dver_contact
-      domain: binary_sensor
-  - service: logbook.log
-    data:
-      name: move
-      message: OPENED, WAIT CLOSED
-      entity_id: automation.left
-  - wait_for_trigger:
-    - type: not_opened
-      platform: device
-      device_id: fe4aea95bdeb8772c679f823a4e54144
-      entity_id: binary_sensor.tualet_dver_contact
-      domain: binary_sensor
-  - service: logbook.log
-    data:
-      name: move
-      message: CLOSED, OFF LIGHT
-      entity_id: automation.left
-  - type: turn_off
-    device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
-    entity_id: light.tualet_svet
-    domain: light
-  - service: input_boolean.turn_off
-    data: {}
-    target:
-      entity_id: input_boolean.toilet_was_movement_inside
-  - service: logbook.log
-    data:
-      name: move
-      message: OFF BOOLEAN, END
-      entity_id: automation.left
-  mode: restart
 - id: '1686047933521'
   alias: Детская кнопка дубль ПК
   description: ''
@@ -1527,4 +1370,72 @@
     data: {}
     target:
       entity_id: input_number.securitycounter
+  mode: single
+- id: '1686937084705'
+  alias: Туалет движение без закрытия
+  description: ''
+  trigger:
+  - type: opened
+    platform: device
+    device_id: fe4aea95bdeb8772c679f823a4e54144
+    entity_id: binary_sensor.tualet_dver_contact
+    domain: binary_sensor
+  condition:
+  - condition: state
+    entity_id: input_boolean.toilet_was_movement_inside
+    state: 'off'
+  action:
+  - service: script.motion_open
+    data: {}
+  mode: restart
+- id: '1687350425039'
+  alias: Охрана по присутствию Pixel5
+  description: ''
+  trigger:
+  - platform: device
+    device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+    domain: device_tracker
+    entity_id: device_tracker.pixel_5
+    type: enters
+    zone: zone.home
+  - platform: device
+    device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+    domain: device_tracker
+    entity_id: device_tracker.pixel_5
+    type: leaves
+    zone: zone.home
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: device
+        device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+        domain: device_tracker
+        entity_id: device_tracker.pixel_5
+        type: is_home
+      sequence:
+      - service: automation.turn_off
+        data:
+          stop_actions: true
+        target:
+          entity_id: automation.okhrana
+      - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+        domain: mobile_app
+        type: notify
+        message: Охрана ВЫКЛ
+    - conditions:
+      - condition: device
+        device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+        domain: device_tracker
+        entity_id: device_tracker.pixel_5
+        type: is_not_home
+      sequence:
+      - service: automation.turn_on
+        data: {}
+        target:
+          entity_id: automation.okhrana
+      - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+        domain: mobile_app
+        type: notify
+        message: Охрана ВКЛ
   mode: single
