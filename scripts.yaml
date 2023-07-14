@@ -3,9 +3,9 @@ motion_closed:
   sequence:
   - service: logbook.log
     data:
-      name: move
-      message: START, OPEN, SET VAR
+      message: START, WAIT CLOSED
       entity_id: automation.left
+      name: close
   - service: input_boolean.turn_on
     data: {}
     target:
@@ -16,18 +16,25 @@ motion_closed:
       device_id: fe4aea95bdeb8772c679f823a4e54144
       entity_id: binary_sensor.tualet_dver_contact
       domain: binary_sensor
+    timeout:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+    continue_on_timeout: false
   - service: logbook.log
     data:
-      name: move
-      message: CLOSED, WAIT MOTION
+      name: close
+      message: CLOSED
       entity_id: automation.left
   - wait_template: '{{ is_state(''binary_sensor.tualet_dvizhenie_occupancy'', ''on'')
       }}'
     continue_on_timeout: true
+    enabled: false
   - service: logbook.log
     data:
-      name: move
-      message: FOUND MOTION, WAIT OPEN
+      name: close
+      message: WAIT OPEN
       entity_id: automation.left
   - wait_for_trigger:
     - type: opened
@@ -37,7 +44,7 @@ motion_closed:
       domain: binary_sensor
   - service: logbook.log
     data:
-      name: move
+      name: close
       message: OPENED, WAIT CLOSED
       entity_id: automation.left
   - wait_for_trigger:
@@ -48,7 +55,7 @@ motion_closed:
       domain: binary_sensor
   - service: logbook.log
     data:
-      name: move
+      name: close
       message: CLOSED, OFF LIGHT
       entity_id: automation.left
   - type: turn_off
@@ -59,9 +66,13 @@ motion_closed:
     data: {}
     target:
       entity_id: input_boolean.toilet_was_movement_inside
+  - service: input_boolean.turn_off
+    data: {}
+    target:
+      entity_id: input_boolean.tualet_dvizhenie_dver_otkryta
   - service: logbook.log
     data:
-      name: move
+      name: close
       message: OFF BOOLEAN, END
       entity_id: automation.left
   mode: single
@@ -71,20 +82,21 @@ motion_open:
   sequence:
   - service: logbook.log
     data:
-      name: move
-      message: START, OPEN, SET VAR
+      name: open
+      message: START
       entity_id: automation.left
   - service: input_boolean.turn_on
     data: {}
     target:
-      entity_id: input_boolean.toilet_was_movement_inside
+      entity_id: input_boolean.tualet_dvizhenie_dver_otkryta
   - wait_template: '{{ is_state(''binary_sensor.tualet_dvizhenie_occupancy'', ''on'')
       }}'
     continue_on_timeout: true
+    enabled: false
   - service: logbook.log
     data:
-      name: move
-      message: HAS MOTION, WAIT CLOSED
+      name: open
+      message: WAIT CLOSED
       entity_id: automation.left
   - wait_for_trigger:
     - type: not_opened
@@ -92,9 +104,14 @@ motion_open:
       device_id: fe4aea95bdeb8772c679f823a4e54144
       entity_id: binary_sensor.tualet_dver_contact
       domain: binary_sensor
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 2
+      milliseconds: 0
   - service: logbook.log
     data:
-      name: move
+      name: open
       message: CLOSED, OFF LIGHT
       entity_id: automation.left
   - type: turn_off
@@ -104,10 +121,55 @@ motion_open:
   - service: input_boolean.turn_off
     data: {}
     target:
+      entity_id: input_boolean.tualet_dvizhenie_dver_otkryta
+  - service: input_boolean.turn_off
+    data: {}
+    target:
       entity_id: input_boolean.toilet_was_movement_inside
   - service: logbook.log
     data:
-      name: move
+      name: open
       message: OFF BOOLEAN, END
       entity_id: automation.left
   mode: restart
+confirm_security_on:
+  alias: Подтвердить изменение охраны
+  use_blueprint:
+    path: homeassistant/confirmable_notification.yaml
+    input:
+      notify_device: 29cffa1aa58cca7e5747c9117af0cdeb
+      confirm_action:
+      - service: automation.turn_on
+        data: {}
+        target:
+          entity_id: automation.okhrana
+      dismiss_action:
+      - service: automation.turn_off
+        data:
+          stop_actions: true
+        target:
+          entity_id: automation.okhrana
+      title: security confirm
+      message: now it {{ states('automation.okhrana')  }}
+      confirm_text: Keep ON
+      dismiss_text: Keep OFF
+  mode: single
+  icon: mdi:bell
+confirmable_notification:
+  alias: Охрана тревога
+  use_blueprint:
+    path: homeassistant/confirmable_notification.yaml
+    input:
+      notify_device: 29cffa1aa58cca7e5747c9117af0cdeb
+      title: 'охрана: тревога!'
+      message: 'нарушений: {{ states(''input_number.securitycounter'')  }}'
+      confirm_text: STOP
+      dismiss_text: Do nothing
+      confirm_action:
+      - service: automation.turn_off
+        data:
+          stop_actions: true
+        target:
+          entity_id: automation.okhrana
+  icon: mdi:bell
+  mode: single

@@ -32,24 +32,6 @@
     entity_id: switch.gostinaia_2_klavishi_right
     domain: switch
   mode: single
-- id: '1678133674271'
-  alias: Заряд pixel 5 низкий/высокий
-  description: ''
-  trigger:
-  - type: power
-    platform: device
-    device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-    entity_id: sensor.pixel_5_battery_power
-    domain: sensor
-    below: 30
-    above: 80
-  condition: []
-  action:
-  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-    domain: mobile_app
-    type: notify
-    message: 'заряд pixel 5: низкий/высокий'
-  mode: single
 - id: '1679554303278'
   alias: Ванная пол включить по времени
   description: ''
@@ -67,11 +49,9 @@
     device_id: b903e279854d467307f8cd96d91ccd96
     entity_id: switch.vannaia_pol
     domain: switch
-  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-    domain: mobile_app
-    type: notify
-    message: пол включён!
-    title: HA
+  - service: notify.notify
+    data:
+      message: пол включён!
   mode: single
 - id: '1679554413428'
   alias: Ванная пол выключить по времени
@@ -90,11 +70,9 @@
     device_id: b903e279854d467307f8cd96d91ccd96
     entity_id: switch.vannaia_pol
     domain: switch
-  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-    domain: mobile_app
-    type: notify
-    message: пол выключён!
-    title: HA
+  - service: notify.notify
+    data:
+      message: пол выключён!
   mode: single
 - id: '1679856785613'
   alias: Кухня подсветка движение
@@ -623,6 +601,7 @@
     data: {}
     target:
       entity_id: timer.toilet_light
+    enabled: false
   - service: input_boolean.turn_off
     data: {}
     target:
@@ -641,6 +620,7 @@
   - condition: state
     entity_id: timer.taimer_tualet_svet
     state: idle
+    enabled: true
   - condition: state
     entity_id: input_boolean.toilet_fan_no_start
     state: 'off'
@@ -1114,15 +1094,7 @@
     device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
     entity_id: light.tualet_svet
     domain: light
-  condition:
-  - condition: time
-    after: '10:00:00'
-    before: '22:00:00'
-    enabled: false
-  - condition: state
-    entity_id: schedule.tualet_vannaia_raspisanie_den
-    state: 'on'
-    enabled: false
+  condition: []
   action:
   - choose:
     - conditions:
@@ -1283,17 +1255,15 @@
     entity_id: binary_sensor.vannaia_dver_contact
     domain: binary_sensor
   - platform: device
-    domain: mqtt
+    type: turned_on
     device_id: de32a39e975899dd8088d80dac8b0c8e
-    type: action
-    subtype: single
-    discovery_id: 0x54ef4410005c41e9 action_single
+    entity_id: switch.prikhozhaia_vkhod
+    domain: switch
   - platform: device
-    domain: mqtt
+    type: turned_on
     device_id: 6f7bf8bd4233f103ce913b5e82c7ef0a
-    type: action
-    subtype: single
-    discovery_id: 0x54ef44100059a06f action_single
+    entity_id: switch.prikhozhaia_prokhod
+    domain: switch
   - platform: device
     type: changed_states
     device_id: 1caa9e19608f785cb00d0e179a7037b6
@@ -1305,59 +1275,48 @@
     entity_id: light.tualet_svet
     domain: light
   - platform: device
-    domain: mqtt
+    type: turned_on
     device_id: 97e0615b18f94d252b3d76007d46c665
-    type: action
-    subtype: single_left
-    discovery_id: 0x54ef4410004db255 action_single_left
+    entity_id: switch.gostinaia_2_klavishi_left
+    domain: switch
   - platform: device
-    domain: mqtt
+    type: turned_on
     device_id: 97e0615b18f94d252b3d76007d46c665
-    type: action
-    subtype: double_right
-    discovery_id: 0x54ef4410004db255 action_double_right
+    entity_id: switch.gostinaia_2_klavishi_right
+    domain: switch
   - platform: device
-    domain: mqtt
+    type: turned_on
     device_id: 0766f4988b021902a3cbf1c54c91b469
-    type: action
-    subtype: single_right
-    discovery_id: 0x54ef4410004e7321 action_single_right
+    entity_id: switch.detskaia_2_klavishi_left
+    domain: switch
   - platform: device
-    domain: mqtt
+    type: turned_on
     device_id: 0766f4988b021902a3cbf1c54c91b469
-    type: action
-    subtype: single_left
-    discovery_id: 0x54ef4410004e7321 action_single_left
+    entity_id: switch.detskaia_2_klavishi_right
+    domain: switch
   - platform: device
-    domain: mqtt
+    type: turned_on
     device_id: ec3fd6bdfe8c439ad6599a7a82935eaa
-    type: action
-    subtype: single_right
-    discovery_id: 0x54ef4410004e73e8 action_single_right
+    entity_id: switch.kukhnia_2_klavishi_left
+    domain: switch
   - platform: device
-    domain: mqtt
+    type: turned_on
     device_id: ec3fd6bdfe8c439ad6599a7a82935eaa
-    type: action
-    subtype: single_left
-    discovery_id: 0x54ef4410004e73e8 action_single_left
+    entity_id: switch.kukhnia_2_klavishi_right
+    domain: switch
   - platform: device
-    domain: mqtt
+    type: turned_on
     device_id: cea131d0cc56c10c9c8aec6c27c41830
-    type: action
-    subtype: single
-    discovery_id: 0x54ef44100050f803 action_single
+    entity_id: switch.0x54ef44100050f803
+    domain: switch
   condition: []
   action:
-  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-    domain: mobile_app
-    type: notify
-    message: '{{ states(''input_number.securitycounter'')  }}'
-    title: 'охрана: тревога!'
-    enabled: true
   - service: input_number.increment
     data: {}
     target:
       entity_id: input_number.securitycounter
+  - service: script.confirmable_notification
+    data: {}
   mode: single
 - id: '1686937084705'
   alias: Туалет движение без закрытия
@@ -1377,7 +1336,7 @@
     data: {}
   mode: restart
 - id: '1687350425039'
-  alias: Охрана по присутствию Pixel5
+  alias: Охрана по присутствию
   description: ''
   trigger:
   - platform: device
@@ -1386,53 +1345,246 @@
     entity_id: device_tracker.pixel_5
     type: enters
     zone: zone.home
+    enabled: false
   - platform: device
     device_id: 29cffa1aa58cca7e5747c9117af0cdeb
     domain: device_tracker
     entity_id: device_tracker.pixel_5
     type: leaves
     zone: zone.home
+    enabled: false
+  - platform: device
+    device_id: bf4876d1a04fc53fd272621e5f48c5a8
+    domain: device_tracker
+    entity_id: device_tracker.signalizatsiia_starline_location
+    type: enters
+    zone: zone.home
+    enabled: false
+  - platform: device
+    device_id: bf4876d1a04fc53fd272621e5f48c5a8
+    domain: device_tracker
+    entity_id: device_tracker.signalizatsiia_starline_location
+    type: leaves
+    zone: zone.home
+    enabled: false
+  - platform: state
+    entity_id:
+    - device_tracker.pixel_5
+  - platform: state
+    entity_id:
+    - device_tracker.pixel_5
+    to: home
+    enabled: false
+  - platform: state
+    entity_id:
+    - device_tracker.signalizatsiia_starline_location
+    enabled: false
+  - platform: state
+    entity_id:
+    - device_tracker.signalizatsiia_starline_location
+    to: home
+    enabled: false
   condition: []
   action:
   - choose:
     - conditions:
-      - condition: device
-        device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-        domain: device_tracker
-        entity_id: device_tracker.pixel_5
-        type: is_home
+      - condition: or
+        conditions:
+        - condition: device
+          device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+          domain: device_tracker
+          entity_id: device_tracker.pixel_5
+          type: is_home
+        - condition: device
+          device_id: bf4876d1a04fc53fd272621e5f48c5a8
+          domain: device_tracker
+          entity_id: device_tracker.signalizatsiia_starline_location
+          type: is_home
+      - condition: state
+        entity_id: automation.okhrana
+        state: 'on'
       sequence:
-      - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-        domain: mobile_app
-        type: notify
-        message: Охрана 5 мин до выключения
-      - delay:
-          hours: 0
-          minutes: 5
-          seconds: 0
-          milliseconds: 0
       - service: automation.turn_off
         data:
           stop_actions: true
         target:
           entity_id: automation.okhrana
-      - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-        domain: mobile_app
-        type: notify
-        message: Охрана ВЫКЛ
+      - service: script.confirm_security_on
+        data: {}
     - conditions:
-      - condition: device
-        device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-        domain: device_tracker
-        entity_id: device_tracker.pixel_5
-        type: is_not_home
+      - condition: or
+        conditions:
+        - condition: device
+          device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+          domain: device_tracker
+          entity_id: device_tracker.pixel_5
+          type: is_not_home
+        - condition: device
+          device_id: bf4876d1a04fc53fd272621e5f48c5a8
+          domain: device_tracker
+          entity_id: device_tracker.signalizatsiia_starline_location
+          type: is_not_home
+      - condition: state
+        entity_id: automation.okhrana
+        state: 'off'
       sequence:
       - service: automation.turn_on
         data: {}
         target:
           entity_id: automation.okhrana
-      - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-        domain: mobile_app
-        type: notify
-        message: Охрана ВКЛ
+      - service: script.confirm_security_on
+        data: {}
+  mode: single
+- id: '1687814111309'
+  alias: Туалет движение любая дверь
+  description: ''
+  trigger:
+  - type: opened
+    platform: device
+    device_id: fe4aea95bdeb8772c679f823a4e54144
+    entity_id: binary_sensor.tualet_dver_contact
+    domain: binary_sensor
+  condition:
+  - condition: and
+    conditions:
+    - condition: state
+      entity_id: input_boolean.toilet_was_movement_inside
+      state: 'off'
+    - condition: state
+      entity_id: input_boolean.tualet_dvizhenie_dver_otkryta
+      state: 'off'
+  action:
+  - parallel:
+    - service: script.motion_closed
+      data: {}
+    - service: script.motion_open
+      data: {}
+  mode: restart
+- id: '1688134604383'
+  alias: Полив старт по времени
+  description: ''
+  trigger:
+  - platform: time
+    at: 07:00:00
+  condition: []
+  action:
+  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+    domain: mobile_app
+    type: notify
+    message: полив
+    title: начато
+  - service: timer.start
+    data: {}
+    target:
+      entity_id: timer.poliv
+  - type: turn_on
+    device_id: b3d91aab9ddc6c01a0f36e7d5307ac29
+    entity_id: switch.wd_01ade_switch_1
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 2
+      seconds: 0
+      milliseconds: 0
+  - type: turn_off
+    device_id: b3d91aab9ddc6c01a0f36e7d5307ac29
+    entity_id: switch.wd_01ade_switch_1
+    domain: switch
+  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+    domain: mobile_app
+    type: notify
+    message: полив
+    title: завершено
+  mode: single
+- id: '1688135472400'
+  alias: Полив дополнительное выключение
+  description: для подстраховки
+  trigger:
+  - platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.poliv
+  - platform: time_pattern
+    minutes: /3
+  - platform: homeassistant
+    event: start
+  condition:
+  - condition: or
+    conditions:
+    - condition: device
+      type: is_on
+      device_id: b3d91aab9ddc6c01a0f36e7d5307ac29
+      entity_id: switch.wd_01ade_switch_1
+      domain: switch
+    - condition: device
+      type: is_on
+      device_id: b3d91aab9ddc6c01a0f36e7d5307ac29
+      entity_id: switch.wd_01ade_switch_2
+      domain: switch
+  action:
+  - type: turn_off
+    device_id: b3d91aab9ddc6c01a0f36e7d5307ac29
+    entity_id: switch.wd_01ade_switch_1
+    domain: switch
+  - type: turn_off
+    device_id: b3d91aab9ddc6c01a0f36e7d5307ac29
+    entity_id: switch.wd_01ade_switch_2
+    domain: switch
+  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+    domain: mobile_app
+    type: notify
+    message: полив
+    title: выключен подстраховкой!
+  mode: single
+- id: '1689338028789'
+  alias: Туалет дверь длительность открытия
+  description: ''
+  trigger:
+  - type: opened
+    platform: device
+    device_id: fe4aea95bdeb8772c679f823a4e54144
+    entity_id: binary_sensor.tualet_dver_contact
+    domain: binary_sensor
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0
+    enabled: true
+  condition:
+  - condition: template
+    value_template: '{{ is_state(''binary_sensor.tualet_dver_contact'', ''on'') and
+      (as_timestamp(now()) - as_timestamp(states(''sensor.tualet_dver_last_seen''))
+      < 5) }}'
+    enabled: false
+  action:
+  - wait_for_trigger:
+    - type: not_opened
+      platform: device
+      device_id: fe4aea95bdeb8772c679f823a4e54144
+      entity_id: binary_sensor.tualet_dver_contact
+      domain: binary_sensor
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 0
+    continue_on_timeout: false
+    timeout:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - service: logbook.log
+    data:
+      name: open
+      message: STOP BY FAST CLOSE (before)
+      entity_id: automation.left
+  - service: script.turn_off
+    data: {}
+    target:
+      entity_id: script.motion_open
+  - service: logbook.log
+    data:
+      name: open
+      message: STOP BY FAST CLOSE (after)
+      entity_id: automation.left
   mode: single
