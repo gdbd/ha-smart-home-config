@@ -5,7 +5,8 @@ backups
 *.db
 *.db-*
 .storage
-blueprints
+blueprints/automation/**/
+blueprints/script/**/
 secrets.yaml
 custom_components
 www

@@ -18,7 +18,7 @@ config_editor:
 
 device_tracker:
   - platform: bluetooth_le_tracker
-    track_new_devices: true
+    #track_new_devices: true
 
 http:
  server_port: 9000

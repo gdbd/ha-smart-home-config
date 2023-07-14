@@ -1,0 +1,52 @@
+blueprint:
+  name: Motion-activated Light timers
+  description: Advances with timers
+  domain: automation
+  input:
+    motion_trigger:
+      name: Motion Sensor
+      selector:
+        entity:
+          domain: binary_sensor
+          device_class: motion
+    light_switch:
+      name: Light switch
+      selector:
+        target:
+          entity:
+            domain: switch
+    time_motion_delay:              
+      name: Time Delay motion
+      default: 15
+      selector:
+        number:
+          min: 0.0
+          max: 30.0
+          step: 0.5
+          unit_of_measurement: minutes
+          mode: slider
+    time_manual_off_delay:              
+      name: Time Delay manual off
+      default: 1
+      selector:
+        number:
+          min: 0.0
+          max: 30.0
+          step: 0.5
+          unit_of_measurement: minutes
+          mode: slider
+
+
+mode: restart
+max_exceeded: silent
+
+variables:
+ motion_trigger: !input motion_trigger
+ light_switch: !input light_switch
+ time_motion_delay: !input time_motion_delay
+ time_manual_off_delay: !input time_manual_off_delay
+  
+trigger:
+
+
+action:

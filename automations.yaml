@@ -1588,3 +1588,17 @@
       message: STOP BY FAST CLOSE (after)
       entity_id: automation.left
   mode: single
+- id: '1689369038273'
+  alias: тест кухня подсветка
+  description: ''
+  use_blueprint:
+    path: Blackshome/sensor-light.yaml
+    input:
+      motion_trigger:
+      - binary_sensor.kukhnia_dvizhenie_occupancy
+      light_switch:
+        entity_id: switch.0x54ef44100050f803
+      time_delay: 15
+      include_bypass: bypass_disabled
+      motion_bypass: switch.0x54ef44100050f803
+      bypass_time_delay: 1
