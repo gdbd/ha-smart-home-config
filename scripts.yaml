@@ -60,7 +60,7 @@ motion_closed:
       entity_id: automation.left
   - type: turn_off
     device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
-    entity_id: light.tualet_svet
+    entity_id: light.protechka_2
     domain: light
   - service: input_boolean.turn_off
     data: {}
@@ -116,7 +116,7 @@ motion_open:
       entity_id: automation.left
   - type: turn_off
     device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
-    entity_id: light.tualet_svet
+    entity_id: light.protechka_2
     domain: light
   - service: input_boolean.turn_off
     data: {}
@@ -155,21 +155,107 @@ confirm_security_on:
       dismiss_text: Keep OFF
   mode: single
   icon: mdi:bell
-confirmable_notification:
-  alias: Охрана тревога
-  use_blueprint:
-    path: homeassistant/confirmable_notification.yaml
-    input:
-      notify_device: 29cffa1aa58cca7e5747c9117af0cdeb
-      title: 'охрана: тревога!'
-      message: 'нарушений: {{ states(''input_number.securitycounter'')  }}'
-      confirm_text: STOP
-      dismiss_text: Do nothing
-      confirm_action:
-      - service: automation.turn_off
-        data:
-          stop_actions: true
-        target:
-          entity_id: automation.okhrana
-  icon: mdi:bell
+'1690147971471':
+  alias: Прихожая вход включение
+  sequence:
+  - type: turn_on
+    device_id: 90aa0484d31a94b1d4d4d948dd110d6e
+    entity_id: switch.rele_1_prikhozhaia
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - type: turn_on
+    device_id: 72eeaeae01b2acf389f49618daffd088
+    entity_id: switch.rele_2_prikhozhaia
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - type: turn_on
+    device_id: 87c95991e903d8024ab0f9f8696f8878
+    entity_id: switch.rele_3_prikhozhaia
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - type: turn_on
+    device_id: ae2c37aacdcc1e44de86c9388b0b7c48
+    entity_id: switch.rele_4_prikhozhaia
+    domain: switch
+  mode: single
+'1690148096831':
+  alias: Прихожая вход выключение
+  sequence:
+  - type: turn_off
+    device_id: ae2c37aacdcc1e44de86c9388b0b7c48
+    entity_id: switch.rele_4_prikhozhaia
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - type: turn_off
+    device_id: 87c95991e903d8024ab0f9f8696f8878
+    entity_id: switch.rele_3_prikhozhaia
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - type: turn_off
+    device_id: 72eeaeae01b2acf389f49618daffd088
+    entity_id: switch.rele_2_prikhozhaia
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - type: turn_off
+    device_id: 90aa0484d31a94b1d4d4d948dd110d6e
+    entity_id: switch.rele_1_prikhozhaia
+    domain: switch
+  mode: single
+'1690148303882':
+  alias: Прихожая проход включение
+  sequence:
+  - type: turn_on
+    device_id: 33c118aa699feba0355a0ddab8d1827f
+    entity_id: switch.rele_5_prikhozhaia
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - type: turn_on
+    device_id: 0b6a92edcaa392f81f72f95170d5bf87
+    entity_id: switch.rele_6_prikhozhaia
+    domain: switch
+  mode: single
+'1690148420628':
+  alias: Прихожая проход выключение
+  sequence:
+  - type: turn_off
+    device_id: 0b6a92edcaa392f81f72f95170d5bf87
+    entity_id: switch.rele_6_prikhozhaia
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - type: turn_off
+    device_id: 33c118aa699feba0355a0ddab8d1827f
+    entity_id: switch.rele_5_prikhozhaia
+    domain: switch
   mode: single

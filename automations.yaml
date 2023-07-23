@@ -588,7 +588,7 @@
   trigger:
   - platform: device
     type: turned_on
-    device_id: d8c2f6a820e5bc2b3f76cf334f4e2fef
+    device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
     entity_id: light.tualet_svet
     domain: light
   condition: []
@@ -616,6 +616,11 @@
     - light.tualet_svet
     from: 'on'
     to: 'off'
+  - platform: device
+    type: turned_off
+    device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
+    entity_id: light.tualet_svet
+    domain: light
   condition:
   - condition: state
     entity_id: timer.taimer_tualet_svet
@@ -785,30 +790,6 @@
     entity_id: switch.prikhozhaia_vkhod
     domain: switch
   mode: single
-- id: '1685049809653'
-  alias: 'Туалет свет выключен: сбросить таймер'
-  description: ''
-  trigger:
-  - platform: device
-    type: turned_off
-    device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
-    entity_id: light.tualet_svet
-    domain: light
-  condition: []
-  action:
-  - service: timer.cancel
-    data: {}
-    target:
-      entity_id: timer.taimer_tualet_svet
-  - service: timer.cancel
-    data: {}
-    target:
-      entity_id: timer.toilet_light
-  - service: input_boolean.turn_off
-    data: {}
-    target:
-      entity_id: input_boolean.toilet_was_movement_inside
-  mode: single
 - id: '1685215994085'
   alias: 'Туалет дверь открыта: включить свет'
   description: ''
@@ -883,23 +864,6 @@
     entity_id: switch.prikhozhaia_vkhod
     domain: switch
   mode: single
-- id: '1685338454487'
-  alias: Туалет движение после закрытия
-  description: ''
-  trigger:
-  - type: opened
-    platform: device
-    device_id: fe4aea95bdeb8772c679f823a4e54144
-    entity_id: binary_sensor.tualet_dver_contact
-    domain: binary_sensor
-  condition:
-  - condition: state
-    entity_id: input_boolean.toilet_was_movement_inside
-    state: 'off'
-  action:
-  - service: script.motion_closed
-    data: {}
-  mode: restart
 - id: '1685341713816'
   alias: Кухня дубль удержание
   description: ''
@@ -983,51 +947,6 @@
     entity_id: light.vannaia_svet
     domain: light
   mode: single
-- id: '1685345034027'
-  alias: Туалет свет продление
-  description: ''
-  trigger:
-  - type: motion
-    platform: device
-    device_id: 70352209ac0baa1903d206e757e47588
-    entity_id: binary_sensor.tualet_dvizhenie_occupancy
-    domain: binary_sensor
-  condition:
-  - condition: device
-    type: is_on
-    device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
-    entity_id: light.tualet_svet
-    domain: light
-  action:
-  - service: timer.start
-    data: {}
-    target:
-      entity_id: timer.toilet_light
-  mode: single
-- id: '1685345342773'
-  alias: Туалет свет таймаут
-  description: ''
-  trigger:
-  - platform: event
-    event_type: timer.finished
-    event_data:
-      entity_id: timer.toilet_light
-  condition:
-  - condition: device
-    type: is_on
-    device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
-    entity_id: light.tualet_svet
-    domain: light
-  action:
-  - type: turn_off
-    device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
-    entity_id: light.tualet_svet
-    domain: light
-  - service: input_boolean.turn_on
-    data: {}
-    target:
-      entity_id: input_boolean.toilet_fan_no_start
-  mode: single
 - id: '1685346141237'
   alias: 'Ванная свет включен: запуск таймера'
   description: ''
@@ -1069,21 +988,22 @@
     device_id: f33886c6b2db3c0d2389e8df6237d397
     entity_id: binary_sensor.vkhodnaia_dver_contact
     domain: binary_sensor
-  condition:
-  - condition: device
-    type: is_off
-    device_id: de32a39e975899dd8088d80dac8b0c8e
-    entity_id: switch.prikhozhaia_vkhod
-    domain: switch
-    enabled: false
-  - condition: state
-    entity_id: schedule.hall_enter
-    state: 'on'
+  condition: []
   action:
-  - type: turn_on
-    device_id: de32a39e975899dd8088d80dac8b0c8e
-    entity_id: switch.prikhozhaia_vkhod
-    domain: switch
+  - if:
+    - condition: state
+      entity_id: schedule.hall_enter
+      state: 'on'
+    then:
+    - type: turn_on
+      device_id: 712ffd3fb57445407a8a9c734b94c063
+      entity_id: switch.prikhozhaia_vkhod
+      domain: switch
+    else:
+    - type: turn_on
+      device_id: 90aa0484d31a94b1d4d4d948dd110d6e
+      entity_id: switch.rele_1_prikhozhaia
+      domain: switch
   mode: single
 - id: '1685472103616'
   alias: 'Туалет свет включен: установить яркость'
@@ -1216,21 +1136,6 @@
     domain: binary_sensor
   - type: motion
     platform: device
-    device_id: c269c13ef41882b58e9d63e33f96484f
-    entity_id: binary_sensor.prikhozhaia_dvizhenie_dver_occupancy
-    domain: binary_sensor
-  - type: motion
-    platform: device
-    device_id: ed407103a3f18dad945d48213cc8b193
-    entity_id: binary_sensor.prikhozhaia_dvizhenie_vkhod_occupancy
-    domain: binary_sensor
-  - type: motion
-    platform: device
-    device_id: 8d82e44094c7bbf69f740df9af6531d6
-    entity_id: binary_sensor.prikhozhaia_dvizhenie_prokhod_occupancy
-    domain: binary_sensor
-  - type: motion
-    platform: device
     device_id: ea74710bfbc16a3895f5a58d03219a53
     entity_id: binary_sensor.vannaia_dvizhenie_occupancy
     domain: binary_sensor
@@ -1309,32 +1214,47 @@
     device_id: cea131d0cc56c10c9c8aec6c27c41830
     entity_id: switch.0x54ef44100050f803
     domain: switch
+  - type: motion
+    platform: device
+    device_id: c269c13ef41882b58e9d63e33f96484f
+    entity_id: binary_sensor.prikhozhaia_1_dvizhenie_occupancy
+    domain: binary_sensor
+  - type: motion
+    platform: device
+    device_id: 6b5e8f3584e2a4972021bfdf0fd651cf
+    entity_id: binary_sensor.prikhozhaia_2_dvizhenie_occupancy
+    domain: binary_sensor
+  - type: motion
+    platform: device
+    device_id: 50024da6545857fb87b81810a7c6373d
+    entity_id: binary_sensor.prikhozhaia_3_dvizhenie_occupancy
+    domain: binary_sensor
+  - type: motion
+    platform: device
+    device_id: ed407103a3f18dad945d48213cc8b193
+    entity_id: binary_sensor.prikhozhaia_4_dvizhenie_occupancy
+    domain: binary_sensor
+  - type: motion
+    platform: device
+    device_id: 4c922d4901098fcb9f23ca07cb327de1
+    entity_id: binary_sensor.prikhozhaia_5_dvizhenie_occupancy
+    domain: binary_sensor
+  - type: motion
+    platform: device
+    device_id: 8d82e44094c7bbf69f740df9af6531d6
+    entity_id: binary_sensor.prikhozhaia_6_dvizhenie_occupancy
+    domain: binary_sensor
   condition: []
   action:
   - service: input_number.increment
     data: {}
     target:
       entity_id: input_number.securitycounter
-  - service: script.confirmable_notification
-    data: {}
+  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+    domain: mobile_app
+    type: notify
+    message: 'Охрана: {{ states(''input_number.securitycounter'')  }}'
   mode: single
-- id: '1686937084705'
-  alias: Туалет движение без закрытия
-  description: ''
-  trigger:
-  - type: opened
-    platform: device
-    device_id: fe4aea95bdeb8772c679f823a4e54144
-    entity_id: binary_sensor.tualet_dver_contact
-    domain: binary_sensor
-  condition:
-  - condition: state
-    entity_id: input_boolean.toilet_was_movement_inside
-    state: 'off'
-  action:
-  - service: script.motion_open
-    data: {}
-  mode: restart
 - id: '1687350425039'
   alias: Охрана по присутствию
   description: ''
@@ -1465,14 +1385,42 @@
   description: ''
   trigger:
   - platform: time
-    at: 07:00:00
-  condition: []
+    at: '12:00:00'
+  condition:
+  - type: is_not_moist
+    condition: device
+    device_id: bff9fac3220eb61b3c7b73755cd01cf6
+    entity_id: binary_sensor.protechka_1_water_leak
+    domain: binary_sensor
+  - type: is_not_moist
+    condition: device
+    device_id: 08dcff36bc1db4c122314cda56a89b47
+    entity_id: binary_sensor.protechka_2_water_leak
+    domain: binary_sensor
+  - type: is_not_moist
+    condition: device
+    device_id: ae6e1a33d1f75935731f6db336851c02
+    entity_id: binary_sensor.protechka_3_water_leak
+    domain: binary_sensor
+  - type: is_not_moist
+    condition: device
+    device_id: 259578870e9214dee04d136b4bce512d
+    entity_id: binary_sensor.protechka_4_water_leak
+    domain: binary_sensor
   action:
   - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
     domain: mobile_app
     type: notify
-    message: полив
-    title: начато
+    message: Полив через 2 минут
+  - delay:
+      hours: 0
+      minutes: 2
+      seconds: 0
+      milliseconds: 0
+  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+    domain: mobile_app
+    type: notify
+    message: Полив начат
   - service: timer.start
     data: {}
     target:
@@ -1483,7 +1431,7 @@
     domain: switch
   - delay:
       hours: 0
-      minutes: 2
+      minutes: 3
       seconds: 0
       milliseconds: 0
   - type: turn_off
@@ -1493,8 +1441,7 @@
   - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
     domain: mobile_app
     type: notify
-    message: полив
-    title: завершено
+    message: Полив завершен
   mode: single
 - id: '1688135472400'
   alias: Полив дополнительное выключение
@@ -1504,8 +1451,9 @@
     event_type: timer.finished
     event_data:
       entity_id: timer.poliv
+    enabled: false
   - platform: time_pattern
-    minutes: /3
+    minutes: /5
   - platform: homeassistant
     event: start
   condition:
@@ -1533,8 +1481,7 @@
   - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
     domain: mobile_app
     type: notify
-    message: полив
-    title: выключен подстраховкой!
+    message: Полив выключен подстраховкой!
   mode: single
 - id: '1689338028789'
   alias: Туалет дверь длительность открытия
@@ -1588,17 +1535,151 @@
       message: STOP BY FAST CLOSE (after)
       entity_id: automation.left
   mode: single
-- id: '1689369038273'
-  alias: тест кухня подсветка
+- id: '1690141694594'
+  alias: Прихожая вход выключатель
+  description: ''
+  trigger:
+  - platform: device
+    type: changed_states
+    device_id: 712ffd3fb57445407a8a9c734b94c063
+    entity_id: switch.prikhozhaia_vkhod
+    domain: switch
+  condition: []
+  action:
+  - if:
+    - condition: state
+      entity_id: switch.prikhozhaia_vkhod
+      state: 'on'
+    then:
+    - service: script.1690147971471
+      data: {}
+    else:
+    - service: script.1690148096831
+      data: {}
+  mode: single
+- id: '1690147598337'
+  alias: Прихожая проход выключатель
+  description: ''
+  trigger:
+  - platform: device
+    type: changed_states
+    device_id: c87c44ef24934fb7df148b21d67ef0c4
+    entity_id: switch.prikhozhaia_prokhod
+    domain: switch
+  condition: []
+  action:
+  - if:
+    - condition: state
+      entity_id: switch.prikhozhaia_prokhod
+      state: 'on'
+    then:
+    - service: script.1690148303882
+      data: {}
+    else:
+    - service: script.1690148420628
+      data: {}
+  mode: single
+- id: '1690148911050'
+  alias: Есть Движение 1
   description: ''
   use_blueprint:
-    path: Blackshome/sensor-light.yaml
+    path: homeassistant/motion_light_fix.yaml
     input:
-      motion_trigger:
-      - binary_sensor.kukhnia_dvizhenie_occupancy
-      light_switch:
-        entity_id: switch.0x54ef44100050f803
-      time_delay: 15
-      include_bypass: bypass_disabled
-      motion_bypass: switch.0x54ef44100050f803
-      bypass_time_delay: 1
+      light_target:
+        entity_id: switch.rele_1_prikhozhaia
+      motion_entity: binary_sensor.prikhozhaia_1_dvizhenie_occupancy
+      no_motion_wait: 240
+- id: '1690148983287'
+  alias: Есть движение 2
+  description: ''
+  use_blueprint:
+    path: homeassistant/motion_light_fix.yaml
+    input:
+      motion_entity: binary_sensor.prikhozhaia_2_dvizhenie_occupancy
+      no_motion_wait: 240
+      light_target:
+        entity_id: switch.rele_2_prikhozhaia
+- id: '1690149013021'
+  alias: Есть движение 3
+  description: ''
+  use_blueprint:
+    path: homeassistant/motion_light_fix.yaml
+    input:
+      motion_entity: binary_sensor.prikhozhaia_3_dvizhenie_occupancy
+      no_motion_wait: 240
+      light_target:
+        entity_id: switch.rele_3_prikhozhaia
+- id: '1690149033855'
+  alias: Есть движение 4
+  description: ''
+  use_blueprint:
+    path: homeassistant/motion_light_fix.yaml
+    input:
+      motion_entity: binary_sensor.prikhozhaia_4_dvizhenie_occupancy
+      no_motion_wait: 240
+      light_target:
+        entity_id: switch.rele_4_prikhozhaia
+- id: '1690149053907'
+  alias: Есть движение 5
+  description: ''
+  use_blueprint:
+    path: homeassistant/motion_light_fix.yaml
+    input:
+      motion_entity: binary_sensor.prikhozhaia_5_dvizhenie_occupancy
+      no_motion_wait: 240
+      light_target:
+        entity_id: switch.rele_5_prikhozhaia
+- id: '1690149086863'
+  alias: Есть движение 6
+  description: ''
+  use_blueprint:
+    path: homeassistant/motion_light_fix.yaml
+    input:
+      motion_entity: binary_sensor.prikhozhaia_6_dvizhenie_occupancy
+      no_motion_wait: 240
+      light_target:
+        entity_id: switch.rele_6_prikhozhaia
+- id: '1690150355615'
+  alias: Обнаружена любая протечка
+  description: ''
+  trigger:
+  - type: moist
+    platform: device
+    device_id: bff9fac3220eb61b3c7b73755cd01cf6
+    entity_id: binary_sensor.protechka_1_water_leak
+    domain: binary_sensor
+  - type: moist
+    platform: device
+    device_id: 08dcff36bc1db4c122314cda56a89b47
+    entity_id: binary_sensor.protechka_2_water_leak
+    domain: binary_sensor
+  - type: moist
+    platform: device
+    device_id: ae6e1a33d1f75935731f6db336851c02
+    entity_id: binary_sensor.protechka_3_water_leak
+    domain: binary_sensor
+  - type: moist
+    platform: device
+    device_id: 259578870e9214dee04d136b4bce512d
+    entity_id: binary_sensor.protechka_4_water_leak
+    domain: binary_sensor
+  condition: []
+  action:
+  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+    domain: mobile_app
+    type: notify
+    message: Протечка!
+  - service: automation.turn_off
+    data:
+      stop_actions: true
+    target:
+      entity_id: automation.poliv
+  - type: turn_off
+    device_id: b3d91aab9ddc6c01a0f36e7d5307ac29
+    entity_id: switch.wd_01ade_switch_1
+    domain: switch
+  - type: turn_off
+    device_id: b3d91aab9ddc6c01a0f36e7d5307ac29
+    entity_id: switch.wd_01ade_switch_2
+    domain: switch
+  mode: single
