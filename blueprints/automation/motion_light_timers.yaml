@@ -12,10 +12,11 @@ blueprint:
     light_switch:
       name: Light switch
       selector:
-        target:
-          entity:
-            domain: switch
-    time_motion_delay:              
+        entity:
+          domain: 
+           - light
+           - switch
+    time_motion_delay:
       name: Time Delay motion
       default: 15
       selector:
@@ -25,7 +26,7 @@ blueprint:
           step: 0.5
           unit_of_measurement: minutes
           mode: slider
-    time_manual_off_delay:              
+    time_manual_off_delay:
       name: Time Delay manual off
       default: 1
       selector:
@@ -35,18 +36,92 @@ blueprint:
           step: 0.5
           unit_of_measurement: minutes
           mode: slider
-
+    timer_no_motion:
+      name: Timer
+      selector:
+         target:
+          entity:
+            domain: 
+              - timer
 
 mode: restart
 max_exceeded: silent
 
 variables:
- motion_trigger: !input motion_trigger
- light_switch: !input light_switch
- time_motion_delay: !input time_motion_delay
- time_manual_off_delay: !input time_manual_off_delay
-  
+# motion_trigger: !input motion_trigger
+# light_switch: !input light_switch
+# time_motion_delay: !input time_motion_delay
+# time_manual_off_delay: !input time_manual_off_delay
+  timer_select: !input timer_no_motion
+
+
 trigger:
+  - platform: state
+    entity_id: !input motion_trigger
+    from: 'off'
+    to: 'on'
+    id: motion
+  - platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: !input timer_no_motion
+    id: timer
+  - platform: state
+    entity_id: !input light_switch
+    id: light_on
+    from: "off"
+    to: "on"
+  - platform: state
+    entity_id: !input light_switch
+    id: light_off
+    from: "on"
+    to: "off"
+
+
+condition:
 
 
 action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: light_on
+        sequence:
+          - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+            domain: mobile_app
+            type: notify
+            message: "on"
+            title: ""
+      - conditions:
+          - condition: trigger
+            id: light_off
+        sequence:
+          - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+            domain: mobile_app
+            type: notify
+            message: "off"
+            title: ""
+      - conditions:
+          - condition: trigger
+            id: timer
+        sequence:
+          - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+            domain: mobile_app
+            type: notify
+            message: "timer finished"
+            title: ""
+      - conditions:
+          - condition: trigger
+            id: motion
+        sequence:
+          - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+            domain: mobile_app
+            type: notify
+            message: "timer started"
+            title: ""
+          - service: timer.start
+            data: {}
+            target:
+              entity_id: '{{ timer_select }}'
+
+

@@ -6,6 +6,7 @@ motion_closed:
       message: START, WAIT CLOSED
       entity_id: automation.left
       name: close
+    enabled: false
   - service: input_boolean.turn_on
     data: {}
     target:
@@ -27,6 +28,7 @@ motion_closed:
       name: close
       message: CLOSED
       entity_id: automation.left
+    enabled: false
   - wait_template: '{{ is_state(''binary_sensor.tualet_dvizhenie_occupancy'', ''on'')
       }}'
     continue_on_timeout: true
@@ -36,6 +38,7 @@ motion_closed:
       name: close
       message: WAIT OPEN
       entity_id: automation.left
+    enabled: false
   - wait_for_trigger:
     - type: opened
       platform: device
@@ -47,6 +50,7 @@ motion_closed:
       name: close
       message: OPENED, WAIT CLOSED
       entity_id: automation.left
+    enabled: false
   - wait_for_trigger:
     - type: not_opened
       platform: device
@@ -58,9 +62,10 @@ motion_closed:
       name: close
       message: CLOSED, OFF LIGHT
       entity_id: automation.left
+    enabled: false
   - type: turn_off
     device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
-    entity_id: light.protechka_2
+    entity_id: light.tualet_svet
     domain: light
   - service: input_boolean.turn_off
     data: {}
@@ -75,6 +80,7 @@ motion_closed:
       name: close
       message: OFF BOOLEAN, END
       entity_id: automation.left
+    enabled: false
   mode: single
   icon: mdi:motion-sensor
 motion_open:
@@ -85,6 +91,7 @@ motion_open:
       name: open
       message: START
       entity_id: automation.left
+    enabled: false
   - service: input_boolean.turn_on
     data: {}
     target:
@@ -98,6 +105,7 @@ motion_open:
       name: open
       message: WAIT CLOSED
       entity_id: automation.left
+    enabled: false
   - wait_for_trigger:
     - type: not_opened
       platform: device
@@ -114,9 +122,10 @@ motion_open:
       name: open
       message: CLOSED, OFF LIGHT
       entity_id: automation.left
+    enabled: false
   - type: turn_off
     device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
-    entity_id: light.protechka_2
+    entity_id: light.tualet_svet
     domain: light
   - service: input_boolean.turn_off
     data: {}
@@ -131,6 +140,7 @@ motion_open:
       name: open
       message: OFF BOOLEAN, END
       entity_id: automation.left
+    enabled: false
   mode: restart
 confirm_security_on:
   alias: Подтвердить изменение охраны
@@ -166,7 +176,7 @@ confirm_security_on:
       hours: 0
       minutes: 0
       seconds: 0
-      milliseconds: 500
+      milliseconds: 250
   - type: turn_on
     device_id: 72eeaeae01b2acf389f49618daffd088
     entity_id: switch.rele_2_prikhozhaia
@@ -175,7 +185,7 @@ confirm_security_on:
       hours: 0
       minutes: 0
       seconds: 0
-      milliseconds: 500
+      milliseconds: 250
   - type: turn_on
     device_id: 87c95991e903d8024ab0f9f8696f8878
     entity_id: switch.rele_3_prikhozhaia
@@ -184,7 +194,7 @@ confirm_security_on:
       hours: 0
       minutes: 0
       seconds: 0
-      milliseconds: 500
+      milliseconds: 250
   - type: turn_on
     device_id: ae2c37aacdcc1e44de86c9388b0b7c48
     entity_id: switch.rele_4_prikhozhaia
@@ -257,5 +267,111 @@ confirm_security_on:
   - type: turn_off
     device_id: 33c118aa699feba0355a0ddab8d1827f
     entity_id: switch.rele_5_prikhozhaia
+    domain: switch
+  mode: single
+'1692113141376':
+  alias: Прихожая включение
+  sequence:
+  - type: turn_on
+    device_id: 90aa0484d31a94b1d4d4d948dd110d6e
+    entity_id: switch.rele_1_prikhozhaia
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 250
+  - type: turn_on
+    device_id: 72eeaeae01b2acf389f49618daffd088
+    entity_id: switch.rele_2_prikhozhaia
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 250
+  - type: turn_on
+    device_id: 87c95991e903d8024ab0f9f8696f8878
+    entity_id: switch.rele_3_prikhozhaia
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 250
+  - type: turn_on
+    device_id: ae2c37aacdcc1e44de86c9388b0b7c48
+    entity_id: switch.rele_4_prikhozhaia
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 250
+  - type: turn_on
+    device_id: 33c118aa699feba0355a0ddab8d1827f
+    entity_id: 97ad4f32672d20521840068a1ef9f512
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 250
+  - type: turn_on
+    device_id: 0b6a92edcaa392f81f72f95170d5bf87
+    entity_id: 30c0eb019c7f42adfa9e8adf19655d87
+    domain: switch
+  mode: single
+'1692113251887':
+  alias: Прихожая выключение
+  sequence:
+  - type: turn_off
+    device_id: 0b6a92edcaa392f81f72f95170d5bf87
+    entity_id: 30c0eb019c7f42adfa9e8adf19655d87
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 250
+  - type: turn_off
+    device_id: 33c118aa699feba0355a0ddab8d1827f
+    entity_id: 97ad4f32672d20521840068a1ef9f512
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 250
+  - type: turn_off
+    device_id: ae2c37aacdcc1e44de86c9388b0b7c48
+    entity_id: switch.rele_4_prikhozhaia
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 250
+  - type: turn_off
+    device_id: 87c95991e903d8024ab0f9f8696f8878
+    entity_id: switch.rele_3_prikhozhaia
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 250
+  - type: turn_off
+    device_id: 72eeaeae01b2acf389f49618daffd088
+    entity_id: switch.rele_2_prikhozhaia
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 250
+  - type: turn_off
+    device_id: 90aa0484d31a94b1d4d4d948dd110d6e
+    entity_id: switch.rele_1_prikhozhaia
     domain: switch
   mode: single
