@@ -1,6 +1,6 @@
 blueprint:
-  name: Motion-activated Light timers
-  description: Advances with timers
+  name: Light for motion with timers
+  description: Advanced with timers
   domain: automation
   input:
     motion_trigger:
@@ -9,71 +9,71 @@ blueprint:
         entity:
           domain: binary_sensor
           device_class: motion
+
     light_switch:
       name: Light switch
-      selector:
+      selector: 
         entity:
-          domain: 
-           - light
-           - switch
+          filter:
+            domain:
+              - light
+              - switch
+
     time_motion_delay:
       name: Time Delay motion
-      default: 15
+      default:
+        minutes: 15
       selector:
-        number:
-          min: 0.0
-          max: 30.0
-          step: 0.5
-          unit_of_measurement: minutes
-          mode: slider
+        duration:
+
     time_manual_off_delay:
       name: Time Delay manual off
-      default: 1
+      default:
+        minutes: 1
       selector:
-        number:
-          min: 0.0
-          max: 30.0
-          step: 0.5
-          unit_of_measurement: minutes
-          mode: slider
+        duration:
+
     timer_no_motion:
       name: Timer
       selector:
-         target:
           entity:
-            domain: 
-              - timer
+            filter:
+              domain: timer
 
 mode: restart
 max_exceeded: silent
 
 variables:
+  off_by_timeout: 23
 # motion_trigger: !input motion_trigger
 # light_switch: !input light_switch
 # time_motion_delay: !input time_motion_delay
 # time_manual_off_delay: !input time_manual_off_delay
-  timer_select: !input timer_no_motion
+#  timer_select: !input timer_no_motion
 
 
 trigger:
   - platform: state
+    id: motion
     entity_id: !input motion_trigger
     from: 'off'
-    to: 'on'
-    id: motion
+    to: 'on'  
+
   - platform: event
+    id: timer_finished
     event_type: timer.finished
     event_data:
-      entity_id: !input timer_no_motion
-    id: timer
+      entity_id: !input timer_no_motion 
+
   - platform: state
-    entity_id: !input light_switch
     id: light_on
+    entity_id: !input light_switch    
     from: "off"
     to: "on"
+
   - platform: state
-    entity_id: !input light_switch
     id: light_off
+    entity_id: !input light_switch    
     from: "on"
     to: "off"
 
@@ -83,45 +83,65 @@ condition:
 
 action:
   - choose:
+#---------------------------------------------------------------
       - conditions:
           - condition: trigger
             id: light_on
         sequence:
-          - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-            domain: mobile_app
-            type: notify
-            message: "on"
-            title: ""
+          - service: notify.ha_notificator_denis
+            data:
+              message: "is on"
+          - service: timer.start
+            data:
+              duration: !input time_motion_delay
+            target:
+              entity_id: !input timer_no_motion
+#---------------------------------------------------------------
       - conditions:
           - condition: trigger
             id: light_off
         sequence:
-          - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-            domain: mobile_app
-            type: notify
-            message: "off"
-            title: ""
+          - service: notify.ha_notificator_denis
+            data:
+              message: "is off {{ off_by_timeout }}"
+          - service: timer.finish
+            data: {}
+            target:
+              entity_id: !input timer_no_motion
+#---------------------------------------------------------------
       - conditions:
           - condition: trigger
-            id: timer
+            id: timer_finished
         sequence:
-          - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-            domain: mobile_app
-            type: notify
-            message: "timer finished"
-            title: ""
+          - service: notify.ha_notificator_denis
+            data:
+              message: finished {{ off_by_timeout }}
+          - service: switch.turn_off
+            data: {}
+            target:
+              entity_id: !input light_switch
+#---------------------------------------------------------------
       - conditions:
           - condition: trigger
             id: motion
         sequence:
-          - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-            domain: mobile_app
-            type: notify
-            message: "timer started"
-            title: ""
-          - service: timer.start
+          - service: notify.ha_notificator_denis
+            data:
+              message: motion
+          - service: switch.turn_on
             data: {}
             target:
-              entity_id: '{{ timer_select }}'
+              entity_id: !input light_switch
+          - service: timer.start
+            data:
+              duration: !input time_motion_delay
+            target:
+              entity_id: !input timer_no_motion
+          - service: logbook.log
+            data:
+              message: >
+                {% set off_by_timeout = 42 %}
+                {{ off_by_timeout }}
+#---------------------------------------------------------------
 
 

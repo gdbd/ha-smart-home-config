@@ -1,0 +1,54 @@
+blueprint:
+  name: test timer
+  description: none
+  domain: automation
+  input:
+    motion_entity:
+      name: Motion Sensor
+      selector:
+        entity:
+          domain: binary_sensor
+          device_class: motion
+    timer_no_motion:
+      name: Timer
+      selector:
+        entity:
+         filter:
+          domain: timer
+ 
+
+#variables:
+#  timer_select: !input timer_no_motion
+
+mode: restart
+max_exceeded: silent
+
+trigger:
+  - platform: event
+    id: timer_started
+    event_type: timer.started
+    event_data:
+      entity_id: !input timer_no_motion
+  - platform: event
+    id: timer_finished
+    event_type: timer.finished
+    event_data:
+      entity_id: !input timer_no_motion
+
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: timer_started
+        sequence:
+          - service: notify.ha_notificator_denis
+            data:
+              message: started
+      - conditions:
+          - condition: trigger
+            id: timer_finished
+        sequence:
+          - service: notify.ha_notificator_denis
+            data:
+              message: finished
+

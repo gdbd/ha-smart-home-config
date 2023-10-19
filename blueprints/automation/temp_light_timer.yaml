@@ -14,7 +14,9 @@ blueprint:
       name: Light
       selector:
         entity:
-          domain: light
+          domain: 
+            - light
+            - switch 
     timer_no_motion:
       name: Wait timer
       description: Time to leave the light on after last motion is detected.
