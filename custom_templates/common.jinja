@@ -1,0 +1,28 @@
+{% macro abs(num) %}
+{{iif(num > 0, num, 0-num)|int}}
+{% endmacro %}
+#--------------------------------------------------------------
+{% macro is_seconds_ago_less(entity_id, seconds_to_pass) %}
+{{
+   ((now()|as_timestamp|int) - 
+   (states(entity_id)|as_datetime|as_local|as_timestamp|int)) < seconds_to_pass
+   }}
+{% endmacro %}
+#--------------------------------------------------------------
+{% macro seconds_ago_passed(entity_id) %}
+{{
+   ((now()|as_timestamp|int) - 
+   (states(entity_id)|as_datetime|as_local|as_timestamp|int))
+}}
+{% endmacro %}
+#--------------------------------------------------------------
+{% macro seconds_remains_prop(entity_id, prop_id) %}
+{% set val = as_timestamp(state_attr(entity_id,prop_id), False) %}
+{{ iif(val, abs(now()|as_local|as_timestamp|int - val|as_datetime|as_local|as_timestamp|int), 1_000_000_000_000_000)}}
+{% endmacro %}
+#--------------------------------------------------------------
+{% macro is_seconds_remains_prop_less(entity_id, prop_id,seconds_to_remain) %}
+{% set val = as_timestamp(state_attr(entity_id,prop_id), False) %}
+{{ iif(val, abs(now()|as_local|as_timestamp|int - val|as_datetime|as_local|as_timestamp|int)|int<seconds_to_remain, False)}}
+{% endmacro %}
+#--------------------------------------------------------------
