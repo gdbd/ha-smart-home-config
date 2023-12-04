@@ -26,6 +26,17 @@ blueprint:
             filter:
               domain: timer
 
+    timer_motion_duration:
+      name: Timer for motion duration
+      default: 0
+      selector:
+        number:
+          min: 10
+          max: 1800
+          step: 1
+          unit_of_measurement: seconds
+          mode: slider
+
     timer_manual_off:
       name: Timer manual off
       description: Timer delay motion detection after manual switch off
@@ -33,6 +44,17 @@ blueprint:
         entity:
           filter:
             domain: timer
+
+    timer_manual_off_duration:
+      name: Timer for motion duration
+      default: 0
+      selector:
+        number:
+          min: 1
+          max: 600
+          step: 1
+          unit_of_measurement: seconds
+          mode: slider
 
     off_by_timeout:
       name: Light is off by timeout
@@ -84,11 +106,11 @@ action:
             id: light_on
         sequence:
           - service: timer.start
-            data: {}
+            data:
+              duration: !input timer_motion_duration
             target:
               entity_id: !input timer_motion
           - service: timer.cancel
-            data: {}
             target:
               entity_id: !input timer_manual_off
           - service: input_boolean.turn_off
@@ -105,11 +127,11 @@ action:
                 state: "off"
             then:
               - service: timer.start
-                data: {}
+                data:
+                  duration: !input timer_manual_off_duration
                 target:
                   entity_id: !input timer_manual_off
           - service: timer.cancel
-            data: {}
             target:
               entity_id: !input timer_motion
 #---------------------------------------------------------------
@@ -124,7 +146,6 @@ action:
            target:
              entity_id: !input off_by_timeout
          - service: switch.turn_off
-           data: {}
            target:
              entity_id: !input light_switch 
 #---------------------------------------------------------------
@@ -144,7 +165,8 @@ action:
                 target:
                   entity_id: !input light_switch
               - service: timer.start
-                data: {}
+                data:
+                  duration: !input timer_motion_duration
                 target:
                   entity_id: !input timer_motion
 

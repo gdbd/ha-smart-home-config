@@ -1817,6 +1817,8 @@
       timer_no_motion: timer.test_timer_6
       timer_manual_off: timer.test_timer_7
       timer_motion: timer.test_timer_6
+      timer_motion_duration: 39
+      timer_manual_off_duration: 20
 - id: '1697804050498'
   alias: Кнопка звонок дверь
   description: ''
