@@ -16,26 +16,51 @@ scene: !include scenes.yaml
 
 config_editor:
 
-device_tracker:
-  - platform: bluetooth_le_tracker
+#device_tracker:
+#  - platform: bluetooth_le_tracker
     #track_new_devices: true
 
 http:
  server_port: 9000
 
 
-timer:
-  laundry:
-    name: asd-zxc
-    duration: "00:01:00"
-
 telegram_bot:
   - platform: polling
     api_key: !secret telegram_api_key
     allowed_chat_ids:
       - !secret telegram_chat_id
+      - !secret telegram_chat_id_maria
 
 notify:
   - platform: telegram
     name: "ha_notificator_denis"
     chat_id: !secret telegram_chat_id
+  - platform: telegram
+    name: "ha_notificator_maria"
+    chat_id: !secret telegram_chat_id_maria
+  - platform: group
+    name: "denis&maria"
+    services:
+      - service: ha_notificator_denis
+      - service: ha_notificator_maria
+    
+
+panel_custom:
+  - name: devices
+    sidebar_title: devices
+    sidebar_icon: mdi:devices
+    js_url: /api/hassio/app/entrypoint.js
+    url_path: "config/devices/dashboard"
+    embed_iframe: true
+    require_admin: true
+    config:
+      ingress: core_configurator
+  - name: automations
+    sidebar_title: automations
+    sidebar_icon: mdi:home-automation
+    js_url: /api/hassio/app/entrypoint.js
+    url_path: "config/automation/dashboard"
+    embed_iframe: true
+    require_admin: true
+    config:
+      ingress: core_configurator

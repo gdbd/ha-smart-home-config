@@ -49,7 +49,7 @@
     device_id: b903e279854d467307f8cd96d91ccd96
     entity_id: switch.vannaia_pol
     domain: switch
-  - service: notify.notify
+  - service: notify.ha_notificator_denis
     data:
       message: пол включён!
   mode: single
@@ -70,7 +70,7 @@
     device_id: b903e279854d467307f8cd96d91ccd96
     entity_id: switch.vannaia_pol
     domain: switch
-  - service: notify.notify
+  - service: notify.ha_notificator_denis
     data:
       message: пол выключён!
   mode: single
@@ -355,6 +355,12 @@
     device_id: fe4aea95bdeb8772c679f823a4e54144
     entity_id: binary_sensor.tualet_dver_contact
     domain: binary_sensor
+    enabled: false
+  - platform: state
+    entity_id:
+    - binary_sensor.tualet_dver_contact
+    from: 'off'
+    to: 'on'
   condition:
   - condition: device
     type: is_off
@@ -527,12 +533,6 @@
   alias: Прихожая входная дверь открыта
   description: ''
   trigger:
-  - type: opened
-    platform: device
-    device_id: f33886c6b2db3c0d2389e8df6237d397
-    entity_id: binary_sensor.vkhodnaia_dver_contact
-    domain: binary_sensor
-    enabled: false
   - platform: state
     entity_id:
     - binary_sensor.vkhodnaia_dver_contact
@@ -548,8 +548,8 @@
     - delay:
         hours: 0
         minutes: 0
-        seconds: 1
-        milliseconds: 0
+        seconds: 0
+        milliseconds: 500
     - service: script.1690147971471
       data: {}
     else:
@@ -559,7 +559,8 @@
       domain: switch
   - service: notify.ha_notificator_denis
     data:
-      message: Вход!
+      message: "{% from 'common.jinja' import is_seconds_ago_less %} \n{{ iif(is_seconds_ago_less('input_datetime.hall_last_movement_time',
+        90)|bool==True,'Выход','Вход') }}"
   mode: single
 - id: '1685472103616'
   alias: 'Туалет свет включен: установить яркость'
@@ -648,24 +649,7 @@
         brightness_pct: 30
   mode: single
 - id: '1686047933521'
-  alias: Детская кнопка дубль ПК
-  description: ''
-  trigger:
-  - platform: device
-    domain: mqtt
-    device_id: 0577976c8ca5f6f9511fd21a94449a62
-    type: action
-    subtype: single
-    discovery_id: 0x00158d0009df1a2f action_single
-  condition: []
-  action:
-  - type: toggle
-    device_id: 0766f4988b021902a3cbf1c54c91b469
-    entity_id: switch.detskaia_2_klavishi_right
-    domain: switch
-  mode: single
-- id: '1686047969241'
-  alias: Детская кнопка дубль ЛК
+  alias: Детская кнопка 2 раза
   description: ''
   trigger:
   - platform: device
@@ -674,6 +658,23 @@
     type: action
     subtype: double
     discovery_id: 0x00158d0009df1a2f action_double
+  condition: []
+  action:
+  - type: toggle
+    device_id: 0766f4988b021902a3cbf1c54c91b469
+    entity_id: switch.detskaia_2_klavishi_right
+    domain: switch
+  mode: single
+- id: '1686047969241'
+  alias: Детская кнопка удержание
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 0577976c8ca5f6f9511fd21a94449a62
+    type: action
+    subtype: hold
+    discovery_id: 0x00158d0009df1a2f action_hold
   condition: []
   action:
   - type: toggle
@@ -806,29 +807,14 @@
     data: {}
     target:
       entity_id: input_number.securitycounter
-  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-    domain: mobile_app
-    type: notify
-    message: 'Охрана: {{ states(''input_number.securitycounter'')  }}'
+  - service: notify.ha_notificator_denis
+    data:
+      message: 'Охрана: {{ states(''input_number.securitycounter'')  }}'
   mode: single
 - id: '1687350425039'
   alias: Охрана по присутствию
   description: ''
   trigger:
-  - platform: device
-    device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-    domain: device_tracker
-    entity_id: device_tracker.pixel_5
-    type: enters
-    zone: zone.home
-    enabled: false
-  - platform: device
-    device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-    domain: device_tracker
-    entity_id: device_tracker.pixel_5
-    type: leaves
-    zone: zone.home
-    enabled: false
   - platform: device
     device_id: bf4876d1a04fc53fd272621e5f48c5a8
     domain: device_tracker
@@ -867,9 +853,9 @@
       - condition: or
         conditions:
         - condition: device
-          device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+          device_id: f7675381a3676f188798dc19b23d21a7
           domain: device_tracker
-          entity_id: device_tracker.pixel_5
+          entity_id: 251aefb22791cd7150020e99b9aff5ea
           type: is_home
         - condition: device
           device_id: bf4876d1a04fc53fd272621e5f48c5a8
@@ -891,9 +877,9 @@
       - condition: or
         conditions:
         - condition: device
-          device_id: 29cffa1aa58cca7e5747c9117af0cdeb
+          device_id: f7675381a3676f188798dc19b23d21a7
           domain: device_tracker
-          entity_id: device_tracker.pixel_5
+          entity_id: 251aefb22791cd7150020e99b9aff5ea
           type: is_not_home
         - condition: device
           device_id: bf4876d1a04fc53fd272621e5f48c5a8
@@ -920,6 +906,12 @@
     device_id: fe4aea95bdeb8772c679f823a4e54144
     entity_id: binary_sensor.tualet_dver_contact
     domain: binary_sensor
+    enabled: false
+  - platform: state
+    entity_id:
+    - binary_sensor.tualet_dver_contact
+    from: 'off'
+    to: 'on'
   condition:
   - condition: and
     conditions:
@@ -966,19 +958,17 @@
     entity_id: binary_sensor.protechka_4_water_leak
     domain: binary_sensor
   action:
-  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-    domain: mobile_app
-    type: notify
-    message: Полив через 2 минут
+  - service: notify.ha_notificator_denis
+    data:
+      message: Полив через 2 минут
   - delay:
       hours: 0
       minutes: 2
       seconds: 0
       milliseconds: 0
-  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-    domain: mobile_app
-    type: notify
-    message: Полив начат
+  - service: notify.ha_notificator_denis
+    data:
+      message: Полив начат
   - service: timer.start
     data: {}
     target:
@@ -996,10 +986,9 @@
     device_id: b3d91aab9ddc6c01a0f36e7d5307ac29
     entity_id: switch.wd_01ade_switch_1
     domain: switch
-  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-    domain: mobile_app
-    type: notify
-    message: Полив завершен
+  - service: notify.ha_notificator_denis
+    data:
+      message: Полив завершен
   mode: single
 - id: '1688135472400'
   alias: Полив дополнительное выключение
@@ -1036,10 +1025,9 @@
     device_id: b3d91aab9ddc6c01a0f36e7d5307ac29
     entity_id: switch.wd_01ade_switch_2
     domain: switch
-  - device_id: 29cffa1aa58cca7e5747c9117af0cdeb
-    domain: mobile_app
-    type: notify
-    message: Полив выключен подстраховкой!
+  - service: notify.ha_notificator_denis
+    data:
+      message: Полив выключен подстраховкой!
   mode: single
 - id: '1689338028789'
   alias: Туалет дверь длительность открытия
@@ -1243,12 +1231,14 @@
     domain: binary_sensor
   condition: []
   action:
-  - service: notify.ha_notificator_denis
+  - service: notify.denis_maria
     data:
       title: Протечка!
-      message: '1: {{ states(''binary_sensor.protechka_1_water_leak'') }}  2: {{ states(''binary_sensor.protechka_2_water_leak'')
-        }}  3: {{ states(''binary_sensor.protechka_3_water_leak'') }}  4: {{ states(''binary_sensor.protechka_4_water_leak'')
-        }}'
+      message: "Ванная: {{ iif(states('binary_sensor.protechka_1_water_leak')=='on','Есть','Сухо')
+        }}\nУмывальник: {{ iif(states('binary_sensor.protechka_2_water_leak')=='on','Есть','Сухо')
+        }}  \nТуалет: {{    iif(states('binary_sensor.protechka_3_water_leak')=='on','Есть','Сухо')
+        }} \nКухня: {{ iif(states('binary_sensor.protechka_4_water_leak')=='on','Есть','Сухо')
+        }}"
   - service: automation.turn_off
     data:
       stop_actions: true
@@ -1265,7 +1255,77 @@
     entity_id: switch.wd_01ade_switch_2
     domain: switch
     enabled: false
-  mode: single
+  - parallel:
+    - if:
+      - condition: template
+        value_template: '{{ True }}'
+      then:
+      - wait_template: "{{ \n(states('binary_sensor.protechka_1_water_leak')=='off')
+          and\n(states('binary_sensor.protechka_2_water_leak')=='off') and\n(states('binary_sensor.protechka_3_water_leak')=='off')
+          and \n(states('binary_sensor.protechka_4_water_leak')=='off')\n}}"
+        continue_on_timeout: true
+      - type: turn_off
+        device_id: 317e715efed4668af796f4b9bfd876d6
+        entity_id: 72087670833b39b1022f844b00664f32
+        domain: switch
+      - service: notify.denis_maria
+        data:
+          title: Протечка устаранена
+          message: "Ванная: {{ iif(states('binary_sensor.protechka_1_water_leak')=='on','Есть','Сухо')
+            }}\nУмывальник: {{ iif(states('binary_sensor.protechka_2_water_leak')=='on','Есть','Сухо')
+            }}  \nТуалет: {{    iif(states('binary_sensor.protechka_3_water_leak')=='on','Есть','Сухо')
+            }} \nКухня: {{ iif(states('binary_sensor.protechka_4_water_leak')=='on','Есть','Сухо')
+            }}"
+      - stop: fixed
+      alias: wait fix
+    - if:
+      - condition: template
+        value_template: '{{ True }}'
+      then:
+      - repeat:
+          count: 10
+          sequence:
+          - if:
+            - condition: template
+              value_template: "{{ \n(states('binary_sensor.protechka_1_water_leak')=='off')
+                and\n(states('binary_sensor.protechka_2_water_leak')=='off') and\n(states('binary_sensor.protechka_3_water_leak')=='off')
+                and\n(states('binary_sensor.protechka_4_water_leak')=='off')\n}}"
+            then:
+            - type: turn_off
+              device_id: 317e715efed4668af796f4b9bfd876d6
+              entity_id: 72087670833b39b1022f844b00664f32
+              domain: switch
+            - stop: stop on cycle
+            alias: check fixed
+          - device_id: 317e715efed4668af796f4b9bfd876d6
+            domain: select
+            entity_id: 7d1d93d326cabe7c092fe21ef9ab5102
+            type: select_option
+            option: '7'
+          - device_id: 317e715efed4668af796f4b9bfd876d6
+            domain: number
+            entity_id: 77420ed78e95dab971713e53984d49c3
+            type: set_value
+            value: 2
+          - type: turn_on
+            device_id: 317e715efed4668af796f4b9bfd876d6
+            entity_id: 72087670833b39b1022f844b00664f32
+            domain: switch
+          - delay:
+              hours: 0
+              minutes: 1
+              seconds: 0
+              milliseconds: 0
+      - service: notify.denis_maria
+        data:
+          title: Протечка таймаут
+          message: "Ванная: {{ iif(states('binary_sensor.protechka_1_water_leak')=='on','Есть','Сухо')
+            }}\nУмывальник: {{ iif(states('binary_sensor.protechka_2_water_leak')=='on','Есть','Сухо')
+            }}  \nТуалет: {{    iif(states('binary_sensor.protechka_3_water_leak')=='on','Есть','Сухо')
+            }} \nКухня: {{ iif(states('binary_sensor.protechka_4_water_leak')=='on','Есть','Сухо')
+            }}"
+      alias: alert cycle
+  mode: restart
 - id: '1691485100653'
   alias: 'Ванная есть движение при закрытой двери: пауза таймера'
   description: ''
@@ -1287,113 +1347,16 @@
     target:
       entity_id: timer.bath_light_door
   mode: single
-- id: '1691617886463'
-  alias: Детская 2 клавиши ПК 1 нажатие
-  description: ''
-  trigger:
-  - platform: device
-    domain: mqtt
-    device_id: 0766f4988b021902a3cbf1c54c91b469
-    type: action
-    subtype: single_right
-    discovery_id: 0x54ef4410004e7321 action_single_right
-  condition: []
-  action:
-  - type: toggle
-    device_id: 0766f4988b021902a3cbf1c54c91b469
-    entity_id: eb492973602269f54f47d95b80bc769a
-    domain: switch
-  mode: single
-- id: '1691617958456'
-  alias: Детская 2 клавиши ЛК 1 нажатие
-  description: ''
-  trigger:
-  - platform: device
-    domain: mqtt
-    device_id: 0766f4988b021902a3cbf1c54c91b469
-    type: action
-    subtype: single_left
-    discovery_id: 0x54ef4410004e7321 action_single_left
-  condition: []
-  action:
-  - type: toggle
-    device_id: 0766f4988b021902a3cbf1c54c91b469
-    entity_id: a6772fb1b47d9a4e10f5de4649765ba4
-    domain: switch
-  mode: single
-- id: '1691617992896'
-  alias: Детская 2 клавиши ПК 2 нажатия
-  description: ''
-  trigger:
-  - platform: device
-    domain: mqtt
-    device_id: 0766f4988b021902a3cbf1c54c91b469
-    type: action
-    subtype: double_right
-    discovery_id: 0x54ef4410004e7321 action_double_right
-  condition: []
-  action:
-  - type: toggle
-    device_id: 4d927d700244854a5d3066302473ca09
-    entity_id: 17034e9f9c44fc804c5eeea471578fe4
-    domain: switch
-  mode: single
-- id: '1691618034979'
-  alias: Детская 2 клавиши ЛК 2 нажатия
-  description: ''
-  trigger:
-  - platform: device
-    domain: mqtt
-    device_id: 0766f4988b021902a3cbf1c54c91b469
-    type: action
-    subtype: double_left
-    discovery_id: 0x54ef4410004e7321 action_double_left
-  condition: []
-  action:
-  - type: toggle
-    device_id: e102d81f8a31a1ee1f4d1ce04f953259
-    entity_id: edd69b3928034e9612a768378201b112
-    domain: switch
-  mode: single
-- id: '1691618154656'
-  alias: Детская 2 клавиши Обе клавиши нажатие
-  description: ''
-  trigger:
-  - platform: device
-    domain: mqtt
-    device_id: 0766f4988b021902a3cbf1c54c91b469
-    type: action
-    subtype: single_both
-    discovery_id: 0x54ef4410004e7321 action_single_both
-  condition: []
-  action:
-  - type: toggle
-    device_id: e102d81f8a31a1ee1f4d1ce04f953259
-    entity_id: edd69b3928034e9612a768378201b112
-    domain: switch
-  - type: toggle
-    device_id: 4d927d700244854a5d3066302473ca09
-    entity_id: 17034e9f9c44fc804c5eeea471578fe4
-    domain: switch
-  - type: toggle
-    device_id: 0766f4988b021902a3cbf1c54c91b469
-    entity_id: a6772fb1b47d9a4e10f5de4649765ba4
-    domain: switch
-  - type: toggle
-    device_id: 0766f4988b021902a3cbf1c54c91b469
-    entity_id: eb492973602269f54f47d95b80bc769a
-    domain: switch
-  mode: single
 - id: '1691618362176'
-  alias: Детская кнопка удержание
+  alias: Детская кнопка 1 раз
   description: ''
   trigger:
   - platform: device
     domain: mqtt
     device_id: 0577976c8ca5f6f9511fd21a94449a62
     type: action
-    subtype: hold
-    discovery_id: 0x00158d0009df1a2f action_hold
+    subtype: single
+    discovery_id: 0x00158d0009df1a2f action_single
   condition: []
   action:
   - type: toggle
@@ -1456,23 +1419,15 @@
   alias: Кухня подсветка скоро выключение
   description: ''
   trigger:
-  - platform: state
-    entity_id:
-    - timer.kukhnia_taimer_vykliuchatelia_podsvetki
-    attribute: duration
-    to: 0:14:00
-    enabled: false
   - platform: template
-    value_template: '{{ (as_timestamp(state_attr(''timer.kitchen_backlight_timer'',''finishes_at''),
-      1_000_000_000_000_000) - as_timestamp(now())) < 60 }}'
+    value_template: '{% from ''common.jinja'' import is_seconds_remains_prop_less
+      %}
+
+      {{is_seconds_remains_prop_less(''timer.kitchen_backlight_timer'',''finishes_at'',60)|bool}}'
   condition:
-  - condition: template
-    value_template: '{{ (as_timestamp(state_attr(''timer.bath_light_door'',''finishes_at''),
-      1_000_000_000_000_000) - as_timestamp(now())) < 120 }}'
-    enabled: false
   - condition: time
     after: 07:00:00
-    before: '12:00:00'
+    before: 00:00:00
   action:
   - device_id: 317e715efed4668af796f4b9bfd876d6
     domain: select
@@ -1486,6 +1441,11 @@
     type: set_value
     value: 1
     enabled: true
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
   - type: turn_on
     device_id: 317e715efed4668af796f4b9bfd876d6
     entity_id: 72087670833b39b1022f844b00664f32
@@ -1507,6 +1467,11 @@
     type: set_value
     value: 1
     enabled: true
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
   - type: turn_on
     device_id: 317e715efed4668af796f4b9bfd876d6
     entity_id: 72087670833b39b1022f844b00664f32
@@ -1610,6 +1575,14 @@
         then:
         - service: script.1690148420628
           data: {}
+        - service: automation.trigger
+          data:
+            skip_condition: true
+          target:
+            entity_id: automation.prikhozhaia_dvizhenie_nochnoi_rezhim
+        - service: notify.ha_notificator_denis
+          data:
+            message: 'переход прихожая ночной режим, было включено: проход'
       - if:
         - condition: state
           entity_id: switch.gruppa_rele_vkhod
@@ -1617,6 +1590,14 @@
         then:
         - service: script.1690148096831
           data: {}
+        - service: automation.trigger
+          data:
+            skip_condition: true
+          target:
+            entity_id: automation.prikhozhaia_dvizhenie_nochnoi_rezhim
+        - service: notify.ha_notificator_denis
+          data:
+            message: 'переход прихожая ночной режим, было включено: вход'
   mode: single
 - id: '1693992348607'
   alias: Прихожая движение ночной режим
@@ -1696,8 +1677,8 @@
   condition: []
   action:
   - type: toggle
-    device_id: 31dff8c95c0f707e4e6daf9150bf775e
-    entity_id: d500787d3da7d10a75cf02f2410bffea
+    device_id: 41ac86c278e4a8c9011afa5336d95a9c
+    entity_id: cd47862de026a5b521088c7a814fa740
     domain: switch
   mode: single
 - id: '1695193089078'
@@ -1742,25 +1723,25 @@
       skip_condition: true
     target:
       entity_id: automation.dvizhenie_prikhozhaia_obnovit_datu
-  - wait_template: "{{\n((now()|as_timestamp|round)\n- \n(states('input_datetime.hall_last_movement_time')|as_datetime|as_local|as_timestamp|round))>60\n}}\n"
-    continue_on_timeout: false
-    timeout: '60'
-  - service: notify.ha_notificator_denis
-    data:
-      message: Вход!
-    enabled: false
-  - service: script.1692113251887
-    data: {}
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 45
+      milliseconds: 0
+  - if:
+    - condition: template
+      value_template: '{% from ''common.jinja'' import seconds_ago_passed %}
+
+        {{ seconds_ago_passed(''input_datetime.hall_last_movement_time'')|int > 43
+        }}'
+    then:
+    - service: notify.ha_notificator_denis
+      data:
+        message: 'Вход: закрыто и нет движения'
+      enabled: true
+    - service: script.1692113251887
+      data: {}
   mode: single
-- id: '1696437126339'
-  alias: Прихожая 6 через шаблон с таймером
-  description: ''
-  use_blueprint:
-    path: temp_light_timer.yaml
-    input:
-      entity_target: switch.rele_6_prikhozhaia
-      timer_no_motion: timer.test_timer_6
-      entity_trigger: binary_sensor.prikhozhaia_6_dvizhenie_occupancy
 - id: '1696446359201'
   alias: test timer
   description: ''
@@ -1769,23 +1750,6 @@
     input:
       timer_no_motion: timer.test_timer_6
       motion_entity: binary_sensor.prikhozhaia_6_dvizhenie_occupancy
-- id: '1696694528040'
-  alias: Light for motion with timers 1
-  description: ''
-  use_blueprint:
-    path: motion_light_timers.yaml
-    input:
-      light_switch: switch.wifi_relay_tuya_switch_1
-      motion_trigger: binary_sensor.prikhozhaia_3_dvizhenie_occupancy
-      timer_no_motion: timer.test_timer_6
-      time_motion_delay:
-        hours: 0
-        minutes: 3
-        seconds: 0
-      time_manual_off_delay:
-        hours: 0
-        minutes: 1
-        seconds: 0
 - id: '1696848947314'
   alias: Туалет свет выключен - обновить дату
   description: ''
@@ -1836,4 +1800,330 @@
     device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
     entity_id: b6b9026dbd0bafddb73e085c7a1cbe56
     domain: light
+  mode: single
+- id: '1697744362944'
+  alias: Light for motion with timers 1
+  description: ''
+  use_blueprint:
+    path: motion_light_timers.yaml
+    input:
+      off_by_timeout: input_boolean.test_bool_6
+      motion_trigger: binary_sensor.tualet_dvizhenie_occupancy
+      light_switch: switch.rozetka_kolonki
+      time_motion_delay:
+        hours: 0
+        minutes: 3
+        seconds: 0
+      timer_no_motion: timer.test_timer_6
+      timer_manual_off: timer.test_timer_7
+- id: '1697804050498'
+  alias: Кнопка звонок дверь
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 07221d4d0466ecae4f87d9f1feb4036e
+    type: action
+    subtype: single
+    discovery_id: 0xa4c138dc99733620 action_single
+  condition: []
+  action:
+  - device_id: 317e715efed4668af796f4b9bfd876d6
+    domain: select
+    entity_id: ffbec99621bfd5aa75ff2c4427409b70
+    type: select_option
+    option: high
+  - device_id: 317e715efed4668af796f4b9bfd876d6
+    domain: select
+    entity_id: 7d1d93d326cabe7c092fe21ef9ab5102
+    type: select_option
+    option: '4'
+  - device_id: 317e715efed4668af796f4b9bfd876d6
+    domain: number
+    entity_id: 77420ed78e95dab971713e53984d49c3
+    type: set_value
+    value: 10
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - type: turn_on
+    device_id: 317e715efed4668af796f4b9bfd876d6
+    entity_id: 72087670833b39b1022f844b00664f32
+    domain: switch
+  - service: notify.denis_maria
+    data:
+      message: Звонок в двери
+  mode: single
+- id: '1698397544545'
+  alias: Изменение расхода воды
+  description: ''
+  trigger:
+  - type: water
+    platform: device
+    device_id: 7eb73851fcbda20371e5e247552137cc
+    entity_id: bcca336f84cabe9f4c88a6f5f7babff0
+    domain: sensor
+    above: 0.001
+    enabled: false
+  - platform: state
+    entity_id:
+    - sensor.water_counter_ch1
+    attribute: Cold Water Impulses
+    enabled: false
+  - platform: state
+    entity_id:
+    - sensor.water_counter_ch1
+    attribute: Cold Water Impulses
+  condition: []
+  action:
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.water_cold_diff
+    data:
+      value: '{{ states(''sensor.water_counter_ch1'')|float -states(''input_number.water_cold_last_value'')|float  }}'
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.water_cold_last_value
+    data:
+      value: '{{ states(''sensor.water_counter_ch1'')|float }}'
+  - if:
+    - condition: template
+      value_template: '{{ states(''input_number.water_cold_diff'') | round(2) > 0.02  }}'
+    then:
+    - service: notify.ha_notificator_denis
+      data:
+        message: Расход хол. воды {{ states('input_number.water_cold_diff') | round(2)
+          }}
+  mode: single
+- id: '1699305931010'
+  alias: Пылесос убрался
+  description: ''
+  trigger:
+  - platform: device
+    device_id: 9ef32c5237c3fc7183363c7b574a2f21
+    domain: vacuum
+    entity_id: d13cb932142f2ddf48c8cd05979166d7
+    type: docked
+  condition: []
+  action:
+  - type: turn_off
+    device_id: ec3fd6bdfe8c439ad6599a7a82935eaa
+    entity_id: fc5a2f80a06dce76338654c59696f92a
+    domain: switch
+  - type: turn_off
+    device_id: ec3fd6bdfe8c439ad6599a7a82935eaa
+    entity_id: e0d0d7254fb735aac44a1bcf95272621
+    domain: switch
+  - service: notify.ha_notificator_denis
+    data:
+      message: 'Пылесос убрался '
+  mode: single
+- id: '1699449368126'
+  alias: 'Машина: темперетура в салоне ниже 23 С'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.signalizatsiia_starline_interior_temperature
+  condition:
+  - condition: template
+    value_template: '{{ states(''sensor.signalizatsiia_starline_interior_temperature'')
+      | int < 23 }}'
+  action:
+  - service: notify.ha_notificator_denis
+    data:
+      message: в машине ниже 23 С
+  mode: single
+- id: '1699613882128'
+  alias: Кнопка звонок лифт
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 216703347296609e5efac6be6df5a7b0
+    type: action
+    subtype: single
+    discovery_id: 0x00158d0009ee2ea9 action_single
+  condition: []
+  action:
+  - device_id: 317e715efed4668af796f4b9bfd876d6
+    domain: select
+    entity_id: ffbec99621bfd5aa75ff2c4427409b70
+    type: select_option
+    option: high
+  - device_id: 317e715efed4668af796f4b9bfd876d6
+    domain: select
+    entity_id: 7d1d93d326cabe7c092fe21ef9ab5102
+    type: select_option
+    option: '1'
+  - device_id: 317e715efed4668af796f4b9bfd876d6
+    domain: number
+    entity_id: 77420ed78e95dab971713e53984d49c3
+    type: set_value
+    value: 10
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - type: turn_on
+    device_id: 317e715efed4668af796f4b9bfd876d6
+    entity_id: 72087670833b39b1022f844b00664f32
+    domain: switch
+  - service: notify.denis_maria
+    data:
+      message: 'Звонок в двери: лифт'
+  mode: single
+- id: '1699894515013'
+  alias: 'Машина пробег изменился '
+  description: ''
+  trigger:
+  - type: distance
+    platform: device
+    device_id: bf4876d1a04fc53fd272621e5f48c5a8
+    entity_id: 6179de4b199fd5baa47a308c7c29d377
+    domain: sensor
+    above: 1
+    enabled: false
+  - platform: state
+    entity_id:
+    - sensor.signalizatsiia_starline_mileage
+  condition:
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: sensor.signalizatsiia_starline_mileage
+      state: '44404'
+    - condition: state
+      entity_id: sensor.signalizatsiia_starline_mileage
+      state: '44410'
+    - condition: state
+      entity_id: sensor.signalizatsiia_starline_mileage
+      state: '44404'
+    enabled: false
+  action:
+  - service: notify.ha_notificator_denis
+    data:
+      message: Машина пробег 44444
+  mode: single
+- id: '1700120177522'
+  alias: Уведомление о прогнозе погоды
+  description: ''
+  trigger:
+  - platform: time
+    at: 09:30:00
+  condition: []
+  action:
+  - service: notify.denis_maria
+    data:
+      title: Прогноз погоды
+      message: "Сегодня: {{ states('sensor.yandex_weather_condition_yandex') }} \nСейчас
+        на улице: {{ states('sensor.temperatura_vneshniaia_temperature') }}°C | {{state_attr('weather.yandex_weather','wind_speed')/3.6}}
+        м/с | {{states('sensor.yandex_weather_humidity')}}% | {{states('sensor.yandex_weather_pressure_mmhg')}}
+        mmHg \nОщущается: {{state_attr('weather.yandex_weather','feels_like')}} °C\nЗавтра
+        {{ (state_attr('weather.yandex_weather','forecast')[0].datetime | as_datetime).strftime('%d/%m')
+        \ }}: {{state_attr('weather.yandex_weather','forecast')[0].condition }} |
+        {{state_attr('weather.yandex_weather','forecast')[0].temperature}}°C  | {{
+        (state_attr('weather.yandex_weather','forecast')[0].wind_speed/3.6)|round}}
+        м/с | {{ (state_attr('weather.yandex_weather','forecast')[0].pressure/1.333)|round
+        \ }} mmHg \nПослезавтра {{ (state_attr('weather.yandex_weather','forecast')[1].datetime
+        | as_datetime).strftime('%d/%m')  }}: {{state_attr('weather.yandex_weather','forecast')[1].condition
+        }} | {{state_attr('weather.yandex_weather','forecast')[1].temperature}}°C
+        \ | {{ (state_attr('weather.yandex_weather','forecast')[1].wind_speed/3.6)|round}}
+        м/с | {{ (state_attr('weather.yandex_weather','forecast')[1].pressure/1.333)|round
+        \ }} mmHg"
+  mode: single
+- id: '1701454612967'
+  alias: Холодильник открыт верх
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.kholodilnik_dvertsa_verkhniaia_contact
+    from: 'off'
+    to: 'on'
+  condition: []
+  action:
+  - service: timer.start
+    data: {}
+    target:
+      entity_id: timer.taimer_kholodilnik_verkh
+  mode: single
+- id: '1701454781496'
+  alias: Холодильник закрыт верх
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.kholodilnik_dvertsa_verkhniaia_contact
+    from: 'on'
+    to: 'off'
+  condition: []
+  action:
+  - service: timer.cancel
+    data: {}
+    target:
+      entity_id: timer.taimer_kholodilnik_verkh
+  mode: single
+- id: '1701455150883'
+  alias: Холодильник верх таймаут
+  description: ''
+  trigger:
+  - platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.taimer_kholodilnik_verkh
+  condition: []
+  action:
+  - service: notify.denis_maria
+    data:
+      message: Холодильник верх не закрыт!
+  mode: single
+- id: '1701679503640'
+  alias: Холодильник открыт низ
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.kholodilnik_dvertsa_nizhniaia_contact
+    from: 'off'
+    to: 'on'
+  condition: []
+  action:
+  - service: timer.start
+    data: {}
+    target:
+      entity_id: timer.taimer_kholodilnik_niz
+  mode: single
+- id: '1701679545992'
+  alias: Холодильник закрыт низ
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.kholodilnik_dvertsa_nizhniaia_contact
+    from: 'on'
+    to: 'off'
+  condition: []
+  action:
+  - service: timer.cancel
+    data: {}
+    target:
+      entity_id: timer.taimer_kholodilnik_niz
+  mode: single
+- id: '1701679586544'
+  alias: Холодильник низ таймаут
+  description: ''
+  trigger:
+  - platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.taimer_kholodilnik_niz
+  condition: []
+  action:
+  - service: notify.denis_maria
+    data:
+      message: Холодильник низ не закрыт!
   mode: single

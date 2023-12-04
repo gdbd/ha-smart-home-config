@@ -10,4 +10,6 @@ blueprints/script/**/
 secrets.yaml
 custom_components
 www
+tts
 known_devices.yaml
+

@@ -19,32 +19,36 @@ blueprint:
               - light
               - switch
 
-    time_motion_delay:
-      name: Time Delay motion
-      default:
-        minutes: 15
-      selector:
-        duration:
-
-    time_manual_off_delay:
-      name: Time Delay manual off
-      default:
-        minutes: 1
-      selector:
-        duration:
-
     timer_no_motion:
-      name: Timer
+      name: Timer for motion
       selector:
           entity:
             filter:
               domain: timer
 
+    timer_manual_off:
+      name: Timer manual off
+      description: Timer delay motion detection after manual switch off
+      selector:
+        entity:
+          filter:
+            domain: timer
+
+    off_by_timeout:
+      name: Light is off by timeout
+      selector:
+        entity:
+          filter:
+            domain:
+              input_boolean
+
+
 mode: restart
 max_exceeded: silent
 
-variables:
-  off_by_timeout: 23
+#variables:
+ # temp2: '23'
+#  v_off_by_timeout: !input off_by_timeout
 # motion_trigger: !input motion_trigger
 # light_switch: !input light_switch
 # time_motion_delay: !input time_motion_delay
@@ -57,23 +61,23 @@ trigger:
     id: motion
     entity_id: !input motion_trigger
     from: 'off'
-    to: 'on'  
+    to: 'on'
 
   - platform: event
-    id: timer_finished
+    id: timer_motion_finished
     event_type: timer.finished
     event_data:
       entity_id: !input timer_no_motion 
 
   - platform: state
     id: light_on
-    entity_id: !input light_switch    
+    entity_id: !input light_switch
     from: "off"
     to: "on"
 
   - platform: state
     id: light_off
-    entity_id: !input light_switch    
+    entity_id: !input light_switch
     from: "on"
     to: "off"
 
@@ -88,60 +92,52 @@ action:
           - condition: trigger
             id: light_on
         sequence:
-          - service: notify.ha_notificator_denis
-            data:
-              message: "is on"
           - service: timer.start
-            data:
-              duration: !input time_motion_delay
+            data: {}
             target:
               entity_id: !input timer_no_motion
+          - service: timer.cancel
+            data: {}
+            target:
+              entity_id: !input timer_manual_off
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input off_by_timeout
 #---------------------------------------------------------------
       - conditions:
           - condition: trigger
             id: light_off
         sequence:
-          - service: notify.ha_notificator_denis
-            data:
-              message: "is off {{ off_by_timeout }}"
-          - service: timer.finish
+          - service: timer.start
+            data: {}
+            target:
+              entity_id: !input timer_manual_off
+          - service: timer.cancel
             data: {}
             target:
               entity_id: !input timer_no_motion
 #---------------------------------------------------------------
       - conditions:
           - condition: trigger
-            id: timer_finished
+            id: timer_motion_finished
+          - condition: state
+            entity_id: !input light_switch
+            state: "on"
         sequence:
-          - service: notify.ha_notificator_denis
-            data:
-              message: finished {{ off_by_timeout }}
-          - service: switch.turn_off
-            data: {}
-            target:
-              entity_id: !input light_switch
+         - service: input_boolean.turn_on
+           target:
+             entity_id: !input off_by_timeout
+         - service: switch.turn_off
+           data: {}
+           target:
+             entity_id: !input light_switch 
 #---------------------------------------------------------------
       - conditions:
           - condition: trigger
             id: motion
         sequence:
-          - service: notify.ha_notificator_denis
-            data:
-              message: motion
           - service: switch.turn_on
             data: {}
             target:
               entity_id: !input light_switch
-          - service: timer.start
-            data:
-              duration: !input time_motion_delay
-            target:
-              entity_id: !input timer_no_motion
-          - service: logbook.log
-            data:
-              message: >
-                {% set off_by_timeout = 42 %}
-                {{ off_by_timeout }}
 #---------------------------------------------------------------
-
-

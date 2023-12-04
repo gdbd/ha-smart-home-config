@@ -375,3 +375,54 @@ confirm_security_on:
     entity_id: switch.rele_1_prikhozhaia
     domain: switch
   mode: single
+'1698066863111':
+  alias: Играть мелодию
+  variables:
+    melody: '5'
+  sequence:
+  - device_id: 317e715efed4668af796f4b9bfd876d6
+    domain: number
+    entity_id: 77420ed78e95dab971713e53984d49c3
+    type: set_value
+    value: 5
+  - device_id: 317e715efed4668af796f4b9bfd876d6
+    domain: select
+    entity_id: ffbec99621bfd5aa75ff2c4427409b70
+    type: select_option
+    option: medium
+  - device_id: 317e715efed4668af796f4b9bfd876d6
+    domain: select
+    entity_id: 7d1d93d326cabe7c092fe21ef9ab5102
+    type: select_option
+    option: '5'
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - type: turn_on
+    device_id: 317e715efed4668af796f4b9bfd876d6
+    entity_id: 72087670833b39b1022f844b00664f32
+    domain: switch
+  mode: single
+test_vars:
+  alias: test-vars
+  sequence:
+  - service: var.set
+    data:
+      entity_id: var.temp_test
+      value: '{{ [1,2,3] }}'
+  - service: notify.ha_notificator_denis
+    enabled: false
+    data:
+      message: '{{ states(''var.temp_test'')| string }}'
+  - service: var.set
+    data:
+      entity_id: var.temp_test
+      value: '15'
+    enabled: false
+  - service: notify.ha_notificator_denis
+    data:
+      message: '{{ states(''var.temp_test'') | int }}'
+    enabled: false
+  mode: single
