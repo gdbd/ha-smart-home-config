@@ -1809,13 +1809,14 @@
     input:
       off_by_timeout: input_boolean.test_bool_6
       motion_trigger: binary_sensor.tualet_dvizhenie_occupancy
-      light_switch: switch.rozetka_kolonki
+      light_switch: switch.0x70ac08fffec0fd2a
       time_motion_delay:
         hours: 0
         minutes: 3
         seconds: 0
       timer_no_motion: timer.test_timer_6
       timer_manual_off: timer.test_timer_7
+      timer_motion: timer.test_timer_6
 - id: '1697804050498'
   alias: Кнопка звонок дверь
   description: ''

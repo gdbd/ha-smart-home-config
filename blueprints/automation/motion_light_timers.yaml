@@ -19,7 +19,7 @@ blueprint:
               - light
               - switch
 
-    timer_no_motion:
+    timer_motion:
       name: Timer for motion
       selector:
           entity:
@@ -46,15 +46,6 @@ blueprint:
 mode: restart
 max_exceeded: silent
 
-#variables:
- # temp2: '23'
-#  v_off_by_timeout: !input off_by_timeout
-# motion_trigger: !input motion_trigger
-# light_switch: !input light_switch
-# time_motion_delay: !input time_motion_delay
-# time_manual_off_delay: !input time_manual_off_delay
-#  timer_select: !input timer_no_motion
-
 
 trigger:
   - platform: state
@@ -67,7 +58,7 @@ trigger:
     id: timer_motion_finished
     event_type: timer.finished
     event_data:
-      entity_id: !input timer_no_motion 
+      entity_id: !input timer_motion 
 
   - platform: state
     id: light_on
@@ -95,7 +86,7 @@ action:
           - service: timer.start
             data: {}
             target:
-              entity_id: !input timer_no_motion
+              entity_id: !input timer_motion
           - service: timer.cancel
             data: {}
             target:
@@ -108,14 +99,19 @@ action:
           - condition: trigger
             id: light_off
         sequence:
-          - service: timer.start
-            data: {}
-            target:
-              entity_id: !input timer_manual_off
+          - if:
+              - condition: state
+                entity_id: !input off_by_timeout
+                state: "off"
+            then:
+              - service: timer.start
+                data: {}
+                target:
+                  entity_id: !input timer_manual_off
           - service: timer.cancel
             data: {}
             target:
-              entity_id: !input timer_no_motion
+              entity_id: !input timer_motion
 #---------------------------------------------------------------
       - conditions:
           - condition: trigger
@@ -136,8 +132,22 @@ action:
           - condition: trigger
             id: motion
         sequence:
-          - service: switch.turn_on
-            data: {}
-            target:
-              entity_id: !input light_switch
+          - if:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: !input timer_manual_off
+                    state: idle
+            then:
+              - service: switch.turn_on
+                data: {}
+                target:
+                  entity_id: !input light_switch
+              - service: timer.start
+                data: {}
+                target:
+                  entity_id: !input timer_motion
+
+
+
 #---------------------------------------------------------------
