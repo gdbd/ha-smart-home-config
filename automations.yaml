@@ -1819,6 +1819,10 @@
       timer_motion: timer.test_timer_6
       timer_motion_duration: 39
       timer_manual_off_duration: 20
+      after_time: 07:00:00
+      before_time: 01:00:00
+      min_light_lux: 140
+      light_sensor: sensor.tualet_dvizhenie_illuminance_lux
 - id: '1697804050498'
   alias: Кнопка звонок дверь
   description: ''

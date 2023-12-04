@@ -28,7 +28,7 @@ blueprint:
 
     timer_motion_duration:
       name: Timer for motion duration
-      default: 0
+      default: 300
       selector:
         number:
           min: 10
@@ -47,7 +47,7 @@ blueprint:
 
     timer_manual_off_duration:
       name: Timer for motion duration
-      default: 0
+      default: 60
       selector:
         number:
           min: 1
@@ -63,11 +63,48 @@ blueprint:
           filter:
             domain:
               input_boolean
+    after_time:
+      name: Start Time
+      description: Set the start time
+      default: 00:00:00
+      selector:
+        time: {}
+
+    before_time:
+      name: End Time
+      description: Set the end time
+      default: 00:00:00
+      selector:
+        time: {}
+
+    light_sensor:
+      name: Light sensor
+      default: []
+      selector:
+        entity:
+          domain:
+          - sensor
+          device_class:
+          - illuminance
+
+    min_light_lux:
+      name: Minimum lux to enable
+      default: 20
+      selector:
+        number:
+          min: 0
+          max: 500
+          step: 10
+          unit_of_measurement: LUX
+          mode: slider
 
 
 mode: restart
 max_exceeded: silent
 
+variables:
+  light_sensor: !input light_sensor
+  min_light_lux: !input min_light_lux
 
 trigger:
   - platform: state
@@ -96,7 +133,12 @@ trigger:
 
 
 condition:
-
+  - condition: and
+    conditions:
+    - condition: time
+      after: !input after_time
+      before: !input before_time
+    - '{{ (states[light_sensor].state | int > min_light_lux | int) }}'
 
 action:
   - choose:
