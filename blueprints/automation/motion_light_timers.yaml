@@ -87,8 +87,9 @@ blueprint:
           device_class:
           - illuminance
 
-    min_light_lux:
-      name: Minimum lux to enable
+    max_light_lux:
+      name: Maximum lux to enable
+      description: Lower than value should enable the light
       default: 20
       selector:
         number:
@@ -104,7 +105,7 @@ max_exceeded: silent
 
 variables:
   light_sensor: !input light_sensor
-  min_light_lux: !input min_light_lux
+  max_light_lux: !input max_light_lux
 
 trigger:
   - platform: state
@@ -133,12 +134,7 @@ trigger:
 
 
 condition:
-  - condition: and
-    conditions:
-    - condition: time
-      after: !input after_time
-      before: !input before_time
-    - '{{ (states[light_sensor].state | int > min_light_lux | int) }}'
+
 
 action:
   - choose:
@@ -201,6 +197,13 @@ action:
                   - condition: state
                     entity_id: !input timer_manual_off
                     state: idle
+
+              - condition: and
+                conditions:
+                - condition: time
+                  after: !input after_time
+                  before: !input before_time
+                - '{{ (states[light_sensor].state | int < max_light_lux | int) }}'
             then:
               - service: switch.turn_on
                 data: {}
