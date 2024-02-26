@@ -1,5 +1,5 @@
 blueprint:
-  name: Light for motion with timers
+  name: Light for motion with timers 2
   description: Advanced with timers
   domain: automation
   input:

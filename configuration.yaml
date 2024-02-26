@@ -64,3 +64,39 @@ panel_custom:
     require_admin: true
     config:
       ingress: core_configurator
+
+generic_hygrostat:
+  - name: Увлажнитель термостат гостиная
+    humidifier: humidifier.deerma_jsq2g_b61d_humidifier
+    target_sensor: sensor.temperatura_gostinaia_humidity
+    min_humidity: 40
+    max_humidity: 60
+    target_humidity: 55
+    dry_tolerance: 3
+    wet_tolerance: 0
+    device_class: "humidifier"
+    min_cycle_duration:
+      seconds: 60
+    keep_alive:
+      minutes: 3
+    initial_state: true
+    away_humidity: 35
+    away_fixed: True
+    sensor_stale_duration: 00:15:00
+  - name: Увлажнитель термостат детская
+    humidifier: humidifier.deerma_jsq2g_b5c1_humidifier
+    target_sensor: sensor.temperatura_detskaia_humidity
+    min_humidity: 40
+    max_humidity: 60
+    target_humidity: 55
+    dry_tolerance: 3
+    wet_tolerance: 0
+    device_class: "humidifier"
+    min_cycle_duration:
+      seconds: 60
+    keep_alive:
+      minutes: 3
+    initial_state: true
+    away_humidity: 35
+    away_fixed: True
+    sensor_stale_duration: 00:15:00

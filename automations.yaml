@@ -4,10 +4,9 @@
   trigger:
   - platform: device
     domain: mqtt
-    device_id: cb5a1302a8884dae4b0c8fd478834990
+    device_id: 195f085bbe58e5d9cb58ae799776c5d6
     type: action
     subtype: single_left
-    discovery_id: 0x54ef4410004ff618 action_single_left
   condition: []
   action:
   - type: toggle
@@ -21,10 +20,9 @@
   trigger:
   - platform: device
     domain: mqtt
-    device_id: cb5a1302a8884dae4b0c8fd478834990
+    device_id: 195f085bbe58e5d9cb58ae799776c5d6
     type: action
     subtype: single_right
-    discovery_id: 0x54ef4410004ff618 action_single_right
   condition: []
   action:
   - type: toggle
@@ -36,43 +34,43 @@
   alias: Ванная пол включить по времени
   description: ''
   trigger:
-  - platform: time
-    at: '12:00:00'
-  condition:
-  - condition: device
-    type: is_off
-    device_id: b903e279854d467307f8cd96d91ccd96
-    entity_id: switch.vannaia_pol
-    domain: switch
+  - platform: state
+    entity_id:
+    - schedule.bath_floor_heat_schedule
+    to: 'on'
+  - platform: state
+    entity_id:
+    - schedule.bath_floor_heat_schedule
+    to: 'off'
+  condition: []
   action:
-  - type: turn_on
-    device_id: b903e279854d467307f8cd96d91ccd96
-    entity_id: switch.vannaia_pol
-    domain: switch
-  - service: notify.ha_notificator_denis
-    data:
-      message: пол включён!
-  mode: single
-- id: '1679554413428'
-  alias: Ванная пол выключить по времени
-  description: ''
-  trigger:
-  - platform: time
-    at: '23:00:00'
-  condition:
-  - condition: device
-    type: is_on
-    device_id: b903e279854d467307f8cd96d91ccd96
-    entity_id: switch.vannaia_pol
-    domain: switch
-  action:
-  - type: turn_off
-    device_id: b903e279854d467307f8cd96d91ccd96
-    entity_id: switch.vannaia_pol
-    domain: switch
-  - service: notify.ha_notificator_denis
-    data:
-      message: пол выключён!
+  - if:
+    - condition: state
+      entity_id: schedule.bath_floor_heat_schedule
+      state: 'on'
+    then:
+    - type: turn_on
+      device_id: b903e279854d467307f8cd96d91ccd96
+      entity_id: switch.vannaia_pol
+      domain: switch
+    - service: notify.ha_notificator_denis
+      data:
+        message: пол включён!
+      enabled: true
+    else:
+    - if:
+      - condition: state
+        entity_id: schedule.bath_floor_heat_schedule
+        state: 'off'
+      then:
+      - type: turn_off
+        device_id: b903e279854d467307f8cd96d91ccd96
+        entity_id: c0fe80ee757369b166cd7d80e02344f7
+        domain: switch
+      - service: notify.ha_notificator_denis
+        data:
+          message: пол выключён!
+        enabled: true
   mode: single
 - id: '1679856785613'
   alias: Кухня подсветка движение
@@ -290,7 +288,7 @@
       entity_id: input_boolean.toilet_fan_no_start
   mode: single
 - id: '1683748277532'
-  alias: 'Туалет свет выключен: включить вытяжку'
+  alias: Туалет включить вытяжку
   description: ''
   trigger:
   - platform: state
@@ -298,6 +296,13 @@
     - light.tualet_svet
     from: 'on'
     to: 'off'
+    enabled: false
+  - platform: state
+    entity_id:
+    - binary_sensor.tualet_dver_contact
+    from: 'off'
+    to: 'on'
+    enabled: true
   condition:
   - condition: state
     entity_id: timer.taimer_tualet_svet
@@ -306,6 +311,14 @@
   - condition: state
     entity_id: input_boolean.toilet_fan_no_start
     state: 'off'
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: input_boolean.toilet_was_movement_inside
+      state: 'on'
+    - condition: state
+      entity_id: input_boolean.tualet_dvizhenie_dver_otkryta
+      state: 'on'
   action:
   - service: timer.start
     data: {}
@@ -658,6 +671,12 @@
     type: action
     subtype: double
     discovery_id: 0x00158d0009df1a2f action_double
+  - platform: device
+    domain: mqtt
+    device_id: 77a0233792e754e40294f8f0f35e23b8
+    type: action
+    subtype: rotate_right
+    discovery_id: 0x00158d0005c1a0ea action_rotate_right
   condition: []
   action:
   - type: toggle
@@ -666,15 +685,21 @@
     domain: switch
   mode: single
 - id: '1686047969241'
-  alias: Детская кнопка удержание
+  alias: Детская кнопка 1 раз
   description: ''
   trigger:
   - platform: device
     domain: mqtt
     device_id: 0577976c8ca5f6f9511fd21a94449a62
     type: action
-    subtype: hold
-    discovery_id: 0x00158d0009df1a2f action_hold
+    subtype: single
+    discovery_id: 0x00158d0009df1a2f action_single
+  - platform: device
+    domain: mqtt
+    device_id: 77a0233792e754e40294f8f0f35e23b8
+    type: action
+    subtype: rotate_left
+    discovery_id: 0x00158d0005c1a0ea action_rotate_left
   condition: []
   action:
   - type: toggle
@@ -716,61 +741,6 @@
     device_id: 0b8a16f793e932eaa5160bd857c62c82
     entity_id: binary_sensor.vannaia_dver_contact
     domain: binary_sensor
-  - platform: device
-    type: turned_on
-    device_id: de32a39e975899dd8088d80dac8b0c8e
-    entity_id: switch.prikhozhaia_vkhod
-    domain: switch
-  - platform: device
-    type: turned_on
-    device_id: 6f7bf8bd4233f103ce913b5e82c7ef0a
-    entity_id: switch.prikhozhaia_prokhod
-    domain: switch
-  - platform: device
-    type: changed_states
-    device_id: 1caa9e19608f785cb00d0e179a7037b6
-    entity_id: light.vannaia_svet
-    domain: light
-  - platform: device
-    type: changed_states
-    device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
-    entity_id: light.tualet_svet
-    domain: light
-  - platform: device
-    type: turned_on
-    device_id: 97e0615b18f94d252b3d76007d46c665
-    entity_id: switch.gostinaia_2_klavishi_left
-    domain: switch
-  - platform: device
-    type: turned_on
-    device_id: 97e0615b18f94d252b3d76007d46c665
-    entity_id: switch.gostinaia_2_klavishi_right
-    domain: switch
-  - platform: device
-    type: turned_on
-    device_id: 0766f4988b021902a3cbf1c54c91b469
-    entity_id: switch.detskaia_2_klavishi_left
-    domain: switch
-  - platform: device
-    type: turned_on
-    device_id: 0766f4988b021902a3cbf1c54c91b469
-    entity_id: switch.detskaia_2_klavishi_right
-    domain: switch
-  - platform: device
-    type: turned_on
-    device_id: ec3fd6bdfe8c439ad6599a7a82935eaa
-    entity_id: switch.kukhnia_2_klavishi_left
-    domain: switch
-  - platform: device
-    type: turned_on
-    device_id: ec3fd6bdfe8c439ad6599a7a82935eaa
-    entity_id: switch.kukhnia_2_klavishi_right
-    domain: switch
-  - platform: device
-    type: turned_on
-    device_id: cea131d0cc56c10c9c8aec6c27c41830
-    entity_id: switch.0x54ef44100050f803
-    domain: switch
   - type: motion
     platform: device
     device_id: c269c13ef41882b58e9d63e33f96484f
@@ -810,92 +780,6 @@
   - service: notify.ha_notificator_denis
     data:
       message: 'Охрана: {{ states(''input_number.securitycounter'')  }}'
-  mode: single
-- id: '1687350425039'
-  alias: Охрана по присутствию
-  description: ''
-  trigger:
-  - platform: device
-    device_id: bf4876d1a04fc53fd272621e5f48c5a8
-    domain: device_tracker
-    entity_id: device_tracker.signalizatsiia_starline_location
-    type: enters
-    zone: zone.home
-    enabled: false
-  - platform: device
-    device_id: bf4876d1a04fc53fd272621e5f48c5a8
-    domain: device_tracker
-    entity_id: device_tracker.signalizatsiia_starline_location
-    type: leaves
-    zone: zone.home
-    enabled: false
-  - platform: state
-    entity_id:
-    - device_tracker.pixel_5
-  - platform: state
-    entity_id:
-    - device_tracker.pixel_5
-    to: home
-    enabled: false
-  - platform: state
-    entity_id:
-    - device_tracker.signalizatsiia_starline_location
-    enabled: false
-  - platform: state
-    entity_id:
-    - device_tracker.signalizatsiia_starline_location
-    to: home
-    enabled: false
-  condition: []
-  action:
-  - choose:
-    - conditions:
-      - condition: or
-        conditions:
-        - condition: device
-          device_id: f7675381a3676f188798dc19b23d21a7
-          domain: device_tracker
-          entity_id: 251aefb22791cd7150020e99b9aff5ea
-          type: is_home
-        - condition: device
-          device_id: bf4876d1a04fc53fd272621e5f48c5a8
-          domain: device_tracker
-          entity_id: device_tracker.signalizatsiia_starline_location
-          type: is_home
-      - condition: state
-        entity_id: automation.okhrana
-        state: 'on'
-      sequence:
-      - service: automation.turn_off
-        data:
-          stop_actions: true
-        target:
-          entity_id: automation.okhrana
-      - service: script.confirm_security_on
-        data: {}
-    - conditions:
-      - condition: or
-        conditions:
-        - condition: device
-          device_id: f7675381a3676f188798dc19b23d21a7
-          domain: device_tracker
-          entity_id: 251aefb22791cd7150020e99b9aff5ea
-          type: is_not_home
-        - condition: device
-          device_id: bf4876d1a04fc53fd272621e5f48c5a8
-          domain: device_tracker
-          entity_id: device_tracker.signalizatsiia_starline_location
-          type: is_not_home
-      - condition: state
-        entity_id: automation.okhrana
-        state: 'off'
-      sequence:
-      - service: automation.turn_on
-        data: {}
-        target:
-          entity_id: automation.okhrana
-      - service: script.confirm_security_on
-        data: {}
   mode: single
 - id: '1687814111309'
   alias: Туалет освещение общий сценарий
@@ -1245,16 +1129,6 @@
     target:
       entity_id: automation.poliv
     enabled: false
-  - type: turn_off
-    device_id: b3d91aab9ddc6c01a0f36e7d5307ac29
-    entity_id: switch.wd_01ade_switch_1
-    domain: switch
-    enabled: false
-  - type: turn_off
-    device_id: b3d91aab9ddc6c01a0f36e7d5307ac29
-    entity_id: switch.wd_01ade_switch_2
-    domain: switch
-    enabled: false
   - parallel:
     - if:
       - condition: template
@@ -1335,6 +1209,19 @@
     device_id: ea74710bfbc16a3895f5a58d03219a53
     entity_id: 97739bf8e91fad811f21fbe0907a9587
     domain: binary_sensor
+  - platform: state
+    entity_id:
+    - switch.vannaia_vytiazhka_i_podsvetka_left
+    from:
+  - platform: state
+    entity_id:
+    - switch.vannaia_vytiazhka_i_podsvetka_right
+  - platform: state
+    entity_id:
+    - sensor.vannaia_dimmer_action
+  - platform: state
+    entity_id:
+    - sensor.vannaia_dimmer_action_rotation_percent
   condition:
   - type: is_not_open
     condition: device
@@ -1348,15 +1235,21 @@
       entity_id: timer.bath_light_door
   mode: single
 - id: '1691618362176'
-  alias: Детская кнопка 1 раз
+  alias: Детская кнопка  удержание
   description: ''
   trigger:
   - platform: device
     domain: mqtt
     device_id: 0577976c8ca5f6f9511fd21a94449a62
     type: action
-    subtype: single
-    discovery_id: 0x00158d0009df1a2f action_single
+    subtype: hold
+    discovery_id: 0x00158d0009df1a2f action_hold
+  - platform: device
+    domain: mqtt
+    device_id: 77a0233792e754e40294f8f0f35e23b8
+    type: action
+    subtype: shake
+    discovery_id: 0x00158d0005c1a0ea action_shake
   condition: []
   action:
   - type: toggle
@@ -1583,6 +1476,7 @@
         - service: notify.ha_notificator_denis
           data:
             message: 'переход прихожая ночной режим, было включено: проход'
+          enabled: false
       - if:
         - condition: state
           entity_id: switch.gruppa_rele_vkhod
@@ -1598,6 +1492,7 @@
         - service: notify.ha_notificator_denis
           data:
             message: 'переход прихожая ночной режим, было включено: вход'
+          enabled: false
   mode: single
 - id: '1693992348607'
   alias: Прихожая движение ночной режим
@@ -1681,16 +1576,6 @@
     entity_id: cd47862de026a5b521088c7a814fa740
     domain: switch
   mode: single
-- id: '1695193089078'
-  alias: Туалет движение - свет
-  description: ''
-  use_blueprint:
-    path: homeassistant/motion_light.yaml
-    input:
-      light_target:
-        entity_id: light.tualet_svet
-      motion_entity: binary_sensor.tualet_dvizhenie_occupancy
-      no_motion_wait: 600
 - id: '1695909085559'
   alias: Движение прихожая - обновить дату
   description: ''
@@ -1732,24 +1617,16 @@
     - condition: template
       value_template: '{% from ''common.jinja'' import seconds_ago_passed %}
 
-        {{ seconds_ago_passed(''input_datetime.hall_last_movement_time'')|int > 43
+        {{ seconds_ago_passed(''input_datetime.hall_last_movement_time'')|int > 45
         }}'
     then:
     - service: notify.ha_notificator_denis
       data:
         message: 'Вход: закрыто и нет движения'
-      enabled: true
+      enabled: false
     - service: script.1692113251887
       data: {}
   mode: single
-- id: '1696446359201'
-  alias: test timer
-  description: ''
-  use_blueprint:
-    path: test-timer.yaml
-    input:
-      timer_no_motion: timer.test_timer_6
-      motion_entity: binary_sensor.prikhozhaia_6_dvizhenie_occupancy
 - id: '1696848947314'
   alias: Туалет свет выключен - обновить дату
   description: ''
@@ -1801,29 +1678,6 @@
     entity_id: b6b9026dbd0bafddb73e085c7a1cbe56
     domain: light
   mode: single
-- id: '1697744362944'
-  alias: Light for motion with timers 1
-  description: ''
-  use_blueprint:
-    path: motion_light_timers.yaml
-    input:
-      off_by_timeout: input_boolean.test_bool_6
-      motion_trigger: binary_sensor.tualet_dvizhenie_occupancy
-      light_switch: switch.0x70ac08fffec0fd2a
-      time_motion_delay:
-        hours: 0
-        minutes: 3
-        seconds: 0
-      timer_no_motion: timer.test_timer_6
-      timer_manual_off: timer.test_timer_7
-      timer_motion: timer.test_timer_6
-      timer_motion_duration: 39
-      timer_manual_off_duration: 20
-      after_time: 07:00:00
-      before_time: 01:00:00
-      min_light_lux: 90
-      light_sensor: sensor.tualet_dvizhenie_illuminance_lux
-      max_light_lux: 90
 - id: '1697804050498'
   alias: Кнопка звонок дверь
   description: ''
@@ -1832,15 +1686,23 @@
     domain: mqtt
     device_id: 07221d4d0466ecae4f87d9f1feb4036e
     type: action
-    subtype: single
-    discovery_id: 0xa4c138dc99733620 action_single
+    subtype: 1_single
+  - platform: device
+    domain: mqtt
+    device_id: 07221d4d0466ecae4f87d9f1feb4036e
+    type: action
+    subtype: 1_double
   condition: []
   action:
+  - service: notify.denis_maria
+    data:
+      message: Звонок в двери
   - device_id: 317e715efed4668af796f4b9bfd876d6
     domain: select
     entity_id: ffbec99621bfd5aa75ff2c4427409b70
     type: select_option
     option: high
+    enabled: true
   - device_id: 317e715efed4668af796f4b9bfd876d6
     domain: select
     entity_id: 7d1d93d326cabe7c092fe21ef9ab5102
@@ -1851,39 +1713,25 @@
     entity_id: 77420ed78e95dab971713e53984d49c3
     type: set_value
     value: 10
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 1
-      milliseconds: 0
-  - type: turn_on
-    device_id: 317e715efed4668af796f4b9bfd876d6
-    entity_id: 72087670833b39b1022f844b00664f32
-    domain: switch
-  - service: notify.denis_maria
-    data:
-      message: Звонок в двери
+  - repeat:
+      count: 2
+      sequence:
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 1
+          milliseconds: 0
+      - type: turn_on
+        device_id: 317e715efed4668af796f4b9bfd876d6
+        entity_id: 72087670833b39b1022f844b00664f32
+        domain: switch
   mode: single
 - id: '1698397544545'
   alias: Изменение расхода воды
   description: ''
   trigger:
-  - type: water
-    platform: device
-    device_id: 7eb73851fcbda20371e5e247552137cc
-    entity_id: bcca336f84cabe9f4c88a6f5f7babff0
-    domain: sensor
-    above: 0.001
-    enabled: false
-  - platform: state
-    entity_id:
-    - sensor.water_counter_ch1
-    attribute: Cold Water Impulses
-    enabled: false
-  - platform: state
-    entity_id:
-    - sensor.water_counter_ch1
-    attribute: Cold Water Impulses
+  - platform: time
+    at: '23:00:00'
   condition: []
   action:
   - service: input_number.set_value
@@ -1896,14 +1744,10 @@
       entity_id: input_number.water_cold_last_value
     data:
       value: '{{ states(''sensor.water_counter_ch1'')|float }}'
-  - if:
-    - condition: template
-      value_template: '{{ states(''input_number.water_cold_diff'') | round(2) > 0.02  }}'
-    then:
-    - service: notify.ha_notificator_denis
-      data:
-        message: Расход хол. воды {{ states('input_number.water_cold_diff') | round(2)
-          }}
+  - service: notify.ha_notificator_denis
+    data:
+      message: Расход хол. воды {{ states('input_number.water_cold_diff') | round(2)
+        }}
   mode: single
 - id: '1699305931010'
   alias: Пылесос убрался
@@ -1928,22 +1772,6 @@
     data:
       message: 'Пылесос убрался '
   mode: single
-- id: '1699449368126'
-  alias: 'Машина: темперетура в салоне ниже 23 С'
-  description: ''
-  trigger:
-  - platform: state
-    entity_id:
-    - sensor.signalizatsiia_starline_interior_temperature
-  condition:
-  - condition: template
-    value_template: '{{ states(''sensor.signalizatsiia_starline_interior_temperature'')
-      | int < 23 }}'
-  action:
-  - service: notify.ha_notificator_denis
-    data:
-      message: в машине ниже 23 С
-  mode: single
 - id: '1699613882128'
   alias: Кнопка звонок лифт
   description: ''
@@ -1961,6 +1789,9 @@
     entity_id: ffbec99621bfd5aa75ff2c4427409b70
     type: select_option
     option: high
+  - service: notify.denis_maria
+    data:
+      message: 'Звонок в двери: лифт'
   - device_id: 317e715efed4668af796f4b9bfd876d6
     domain: select
     entity_id: 7d1d93d326cabe7c092fe21ef9ab5102
@@ -1971,18 +1802,18 @@
     entity_id: 77420ed78e95dab971713e53984d49c3
     type: set_value
     value: 10
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 1
-      milliseconds: 0
-  - type: turn_on
-    device_id: 317e715efed4668af796f4b9bfd876d6
-    entity_id: 72087670833b39b1022f844b00664f32
-    domain: switch
-  - service: notify.denis_maria
-    data:
-      message: 'Звонок в двери: лифт'
+  - repeat:
+      count: 2
+      sequence:
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 1
+          milliseconds: 0
+      - type: turn_on
+        device_id: 317e715efed4668af796f4b9bfd876d6
+        entity_id: 72087670833b39b1022f844b00664f32
+        domain: switch
   mode: single
 - id: '1699894515013'
   alias: 'Машина пробег изменился '
@@ -2044,7 +1875,7 @@
         \ }} mmHg"
   mode: single
 - id: '1701454612967'
-  alias: Холодильник открыт верх
+  alias: Холодильник верх открыт или закрыт
   description: ''
   trigger:
   - platform: state
@@ -2052,17 +1883,6 @@
     - binary_sensor.kholodilnik_dvertsa_verkhniaia_contact
     from: 'off'
     to: 'on'
-  condition: []
-  action:
-  - service: timer.start
-    data: {}
-    target:
-      entity_id: timer.taimer_kholodilnik_verkh
-  mode: single
-- id: '1701454781496'
-  alias: Холодильник закрыт верх
-  description: ''
-  trigger:
   - platform: state
     entity_id:
     - binary_sensor.kholodilnik_dvertsa_verkhniaia_contact
@@ -2070,10 +1890,20 @@
     to: 'off'
   condition: []
   action:
-  - service: timer.cancel
-    data: {}
-    target:
-      entity_id: timer.taimer_kholodilnik_verkh
+  - if:
+    - condition: state
+      entity_id: binary_sensor.kholodilnik_dvertsa_verkhniaia_contact
+      state: 'on'
+    then:
+    - service: timer.start
+      data: {}
+      target:
+        entity_id: timer.taimer_kholodilnik_verkh
+    else:
+    - service: timer.cancel
+      target:
+        entity_id: timer.taimer_kholodilnik_verkh
+      data: {}
   mode: single
 - id: '1701455150883'
   alias: Холодильник верх таймаут
@@ -2088,9 +1918,15 @@
   - service: notify.denis_maria
     data:
       message: Холодильник верх не закрыт!
+  - wait_template: '{{ (states(''binary_sensor.kholodilnik_dvertsa_verkhniaia_contact'')
+      == ''off'')|bool }}'
+    continue_on_timeout: false
+  - service: notify.denis_maria
+    data:
+      message: 'Устранено: Холодильник верх'
   mode: single
 - id: '1701679503640'
-  alias: Холодильник открыт низ
+  alias: Холодильник низ открыт или закрыт
   description: ''
   trigger:
   - platform: state
@@ -2098,17 +1934,6 @@
     - binary_sensor.kholodilnik_dvertsa_nizhniaia_contact
     from: 'off'
     to: 'on'
-  condition: []
-  action:
-  - service: timer.start
-    data: {}
-    target:
-      entity_id: timer.taimer_kholodilnik_niz
-  mode: single
-- id: '1701679545992'
-  alias: Холодильник закрыт низ
-  description: ''
-  trigger:
   - platform: state
     entity_id:
     - binary_sensor.kholodilnik_dvertsa_nizhniaia_contact
@@ -2116,10 +1941,21 @@
     to: 'off'
   condition: []
   action:
-  - service: timer.cancel
-    data: {}
-    target:
-      entity_id: timer.taimer_kholodilnik_niz
+  - if:
+    - condition: state
+      entity_id: binary_sensor.kholodilnik_dvertsa_nizhniaia_contact
+      state: 'on'
+    then:
+    - service: timer.start
+      data: {}
+      target:
+        entity_id: timer.taimer_kholodilnik_niz
+    else:
+    - service: timer.cancel
+      target:
+        entity_id:
+        - timer.taimer_kholodilnik_niz
+      data: {}
   mode: single
 - id: '1701679586544'
   alias: Холодильник низ таймаут
@@ -2134,4 +1970,508 @@
   - service: notify.denis_maria
     data:
       message: Холодильник низ не закрыт!
+  - wait_template: '{{ (states(''binary_sensor.kholodilnik_dvertsa_nizhniaia_contact'')
+      == ''off'')|bool }}'
+    continue_on_timeout: false
+  - service: notify.denis_maria
+    data:
+      message: 'Устранено: холодильник низ'
   mode: single
+- id: '1701719064819'
+  alias: Кухня подсветка NEW
+  description: ''
+  use_blueprint:
+    path: motion_light_timers.yaml
+    input:
+      motion_trigger: binary_sensor.kukhnia_dvizhenie_occupancy
+      light_switch: switch.0x54ef44100050f803
+      timer_motion: timer.kitchen_backlight_timer
+      timer_motion_duration: 900
+      timer_manual_off: timer.kukhnia_taimer_vykliuchatelia_podsvetki
+      off_by_timeout: input_boolean.kitchen_backlight_off_by_timeout
+      after_time: 07:00:00
+      before_time: 01:00:00
+      light_sensor: sensor.kukhnia_dvizhenie_illuminance_lux
+      max_light_lux: 65
+- id: '1702660615025'
+  alias: Кубик тест
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 77a0233792e754e40294f8f0f35e23b8
+    type: action
+    subtype: fall
+    discovery_id: 0x00158d0005c1a0ea action_fall
+  condition: []
+  action:
+  - service: notify.ha_notificator_denis
+    data:
+      message: Кубик tap
+    enabled: false
+  - service: yandex_station.send_command
+    data: скажи ой падаю
+    enabled: false
+  - service: tts.yandex_station_say
+    target:
+      entity_id: media_player.yandex_station_ff98f029886c5a3701084a4e
+    data:
+      media_content_id: Лалада
+      media_content_type: Text
+    enabled: false
+  - service: media_player.play_media
+    data:
+      media_content_id: куку
+      media_content_type: Text
+    enabled: true
+    target:
+      device_id: 9a366c896986ad85afaa4de2c1eece3e
+  mode: single
+- id: '1703712760228'
+  alias: Туалет движение NEW
+  description: ''
+  use_blueprint:
+    path: motion_light_timers.yaml
+    input:
+      motion_trigger: binary_sensor.tualet_dvizhenie_occupancy
+      light_switch: light.tualet_svet
+      timer_motion: timer.toilet_light
+      timer_motion_duration: 900
+      timer_manual_off: timer.taimer_tualet_svet_vykliucheno_vruchnuiu
+      timer_manual_off_duration: 60
+      off_by_timeout: input_boolean.taimer_tualet_svet_vykliucheno_vruchnuiu
+      light_sensor: sensor.tualet_dvizhenie_illuminance_lux
+      max_light_lux: 100
+- id: '1704035817089'
+  alias: Кубик гостиная вправо
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 4a20ecfd422cdeab23d669e4d6e8917f
+    type: action
+    subtype: rotate_right
+    discovery_id: 0x00158d0005881372 action_rotate_right
+  condition: []
+  action:
+  - type: toggle
+    device_id: 97e0615b18f94d252b3d76007d46c665
+    entity_id: c8391c6cf4f737e85974c78a4bc3a5c9
+    domain: switch
+  mode: single
+- id: '1704035847904'
+  alias: Кубик гостиная влево
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 4a20ecfd422cdeab23d669e4d6e8917f
+    type: action
+    subtype: rotate_left
+    discovery_id: 0x00158d0005881372 action_rotate_left
+  condition: []
+  action:
+  - type: toggle
+    device_id: 97e0615b18f94d252b3d76007d46c665
+    entity_id: 3fea973c4b69d2e1eccb58d8b77613e1
+    domain: switch
+  mode: single
+- id: '1704964485835'
+  alias: Гостиная воздух co2
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.vozdukh_gostinaia_co2
+    attribute: co2
+  condition:
+  - condition: template
+    value_template: '{{ states(''sensor.vozdukh_gostinaia_co2'')|int > 1200 }}'
+  action:
+  - service: notify.ha_notificator_denis
+    data:
+      message: 'Гостиная CO2: {{ states(''sensor.vozdukh_gostinaia_co2'') }}'
+  - wait_template: '{{ states(''sensor.vozdukh_gostinaia_co2'')|int < 1000 }}'
+    continue_on_timeout: true
+  - service: notify.ha_notificator_denis
+    data:
+      message: 'Исправлено: гостиная CO2: {{ states(''sensor.vozdukh_gostinaia_co2'')
+        }}'
+  mode: single
+  max_exceeded: silent
+- id: '1705390090761'
+  alias: Туалет свет включен и нет движения
+  description: ''
+  trigger:
+  - platform: device
+    type: turned_on
+    device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
+    entity_id: light.tualet_svet
+    domain: light
+  condition: []
+  action:
+  - parallel:
+    - alias: wait motion and get it
+      if:
+      - condition: template
+        value_template: '{{ True }}'
+      then:
+      - wait_template: '{{ is_state(''binary_sensor.tualet_dvizhenie_occupancy'',
+          ''on'') }}'
+        continue_on_timeout: false
+        timeout: '60'
+      - service: notify.ha_notificator_denis
+        data:
+          message: 'туалет свет: оставлен с движением'
+      - stop: found motion
+    - alias: wait motion and timeout
+      if:
+      - condition: template
+        value_template: '{{ True }}'
+      then:
+      - wait_template: '{{ is_state(''binary_sensor.tualet_dvizhenie_occupancy'',
+          ''on'') }}'
+        continue_on_timeout: true
+        timeout: '60'
+      - type: turn_off
+        device_id: de7a71b8fd0f7085ab6f8df702d7a4f0
+        entity_id: b6b9026dbd0bafddb73e085c7a1cbe56
+        domain: light
+      - service: notify.ha_notificator_denis
+        data:
+          message: 'туалет свет: выключено без движения'
+  mode: single
+- id: '1705390390484'
+  alias: Туалет движение - обновить дату
+  description: ''
+  trigger:
+  - type: motion
+    platform: device
+    device_id: 70352209ac0baa1903d206e757e47588
+    entity_id: 8137341f3d6d52ab4b8177d1fac9fb80
+    domain: binary_sensor
+  condition: []
+  action:
+  - service: input_datetime.set_datetime
+    data:
+      datetime: '{{ now() }}'
+    target:
+      entity_id: input_datetime.toilet_last_motion_time
+  mode: single
+- id: '1706034444766'
+  alias: Zigbee/ZWave battery device has gone offline
+  description: ''
+  use_blueprint:
+    path: Tahutipai/zigbee_zwave_notify_when_battery_devices_have_fallen_offline.yaml
+    input:
+      actions:
+      - service: notify.ha_notificator_denis
+        data:
+          message: "{%- set result = namespace(sensors=[]) %} {%- for state in states.sensor
+            | selectattr('attributes.device_class', 'defined') | selectattr('attributes.device_class',
+            '==', 'battery') %}   {%- if \"=unavailable\" in state | string  %}     {%-
+            set result.sensors = result.sensors + [state.entity_id] %}   {%- endif
+            %} {%- endfor %} \nOffline:  {{result.sensors|join('\\n')}}     {%- set
+            result = namespace(sensors=[]) %}     {%- for state in states.binary_sensor
+            | selectattr('attributes.device_class', 'defined') | selectattr('attributes.device_class',
+            '==', 'battery') %}       {%- if \"unavailable\" in state | string %}
+            \        {%- set result.sensors = result.sensors + [state.entity_id] %}
+            \      {%- endif %}     {%- endfor %}\nOffline:  {{result.sensors|join('\\n')}}
+            \ {%- set result = namespace(sensors=[]) %}     {%- for state in states.switch
+            | selectattr('state','eq','unavailable')%}       {%- set result.sensors=
+            result.sensors + [state.entity_id] %}     {%- endfor %}\nOffline: {{result.sensors|join('\\n')}}"
+- id: '1706089520258'
+  alias: 'Увлажнитель гостиная: изменение'
+  description: ''
+  trigger:
+  - platform: device
+    type: changed_states
+    device_id: e65cdc4d4c147ca1df06ad2c69a1ab49
+    entity_id: 8518aaec20a75976bb8f4f1449acf9dd
+    domain: humidifier
+  condition: []
+  action:
+  - service: notify.ha_notificator_denis
+    metadata: {}
+    data:
+      message: 'Увлажнитель гостиная: {{ states(''humidifier.deerma_jsq2g_b61d_humidifier'')
+        }}'
+  mode: single
+- id: '1706111241089'
+  alias: 'Увлажнитель детская: изменение'
+  description: ''
+  trigger:
+  - platform: device
+    type: changed_states
+    device_id: 038579841b8537b8f725cacc842f16ae
+    entity_id: 5d95aeb329455599b7b1d35c8c8808e9
+    domain: humidifier
+  condition: []
+  action:
+  - service: notify.ha_notificator_denis
+    metadata: {}
+    data:
+      message: 'Увлажнитель детская: {{ states(''humidifier.deerma_jsq2g_b5c1_humidifier'')
+        }}'
+  mode: single
+- id: '1707380895889'
+  alias: Туалет диммер вращение
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.tualet_dimmer_action_rotation_percent
+    from: unknown
+  condition:
+  - condition: state
+    entity_id: light.tualet_svet
+    state: 'on'
+    enabled: false
+  - condition: template
+    value_template: '{{ state_attr(''light.tualet_svet'',''brightness'')|int(1) <=
+      178 }}'
+    enabled: false
+  action:
+  - if:
+    - condition: template
+      value_template: '{{ ((state_attr(''light.tualet_svet'',''brightness'')|int(1))+(trigger.to_state.state|int(1)))
+        <= 178 }}'
+    then:
+    - service: light.turn_on
+      data_template:
+        brightness: '{{((state_attr(''light.tualet_svet'',''brightness'')|int(1))+(trigger.to_state.state|int(1)))}}'
+      target:
+        entity_id: light.tualet_svet
+    else:
+    - service: light.turn_on
+      data_template:
+        brightness_pct: 70
+      target:
+        entity_id: light.tualet_svet
+  mode: single
+- id: '1707471793121'
+  alias: Туалет диммер нажатие - вытяжка
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.tualet_dimmer_action
+    attribute: action
+    to: single
+  condition: []
+  action:
+  - type: toggle
+    device_id: 5a586d070a6c7fcfbbde188b8967625c
+    entity_id: b5d7634705545ba5c589a32e80255500
+    domain: switch
+  mode: single
+- id: '1707503648454'
+  alias: Ванная диммер вращение
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.vannaia_dimmer_action_rotation_percent
+    from: unknown
+  condition: []
+  action:
+  - if:
+    - condition: template
+      value_template: '{{ ((state_attr(''light.vannaia_svet'',''brightness'')|int(1))+(trigger.to_state.state|int(1)))
+        <= 191 }}'
+    then:
+    - service: light.turn_on
+      data_template:
+        brightness: '{{((state_attr(''light.vannaia_svet'',''brightness'')|int(1))+(trigger.to_state.state|int(1)))}}'
+      target:
+        entity_id: light.vannaia_svet
+    else:
+    - service: light.turn_on
+      data_template:
+        brightness_pct: 75
+      target:
+        entity_id: light.vannaia_svet
+  mode: single
+- id: '1707722026970'
+  alias: 'Чайник завершён: подогрев'
+  description: ''
+  trigger:
+  - platform: device
+    type: turned_off
+    device_id: 5eeea049a7b678ca7db2e87166e28c20
+    entity_id: 3d6a2c065abea2da028b2faafc005994
+    domain: switch
+  condition:
+  - condition: time
+    after: 07:00:00
+    before: '20:00:00'
+  action:
+  - device_id: 5eeea049a7b678ca7db2e87166e28c20
+    domain: select
+    entity_id: a573a441b98d87879a75d6a6bd20716e
+    type: select_option
+    option: Keep Warm
+  - service: notify.ha_notificator_denis
+    metadata: {}
+    data:
+      message: чайник продлен подогрев
+  mode: single
+- id: '1707811672030'
+  alias: Ванная вытяжка включено-выключено
+  description: ''
+  trigger:
+  - platform: device
+    type: changed_states
+    device_id: d470a7f4ab6ee8f1ddf7b11a472f3b15
+    entity_id: c2fbf8bcb5f90183790bdf17c0728bfd
+    domain: switch
+  condition: []
+  action:
+  - if:
+    - condition: state
+      entity_id: switch.vannaia_vytiazhka_i_podsvetka_right
+      state: 'on'
+    then:
+    - service: timer.start
+      data: {}
+      target:
+        entity_id: timer.bath_fan_timer
+    else:
+    - service: timer.finish
+      target:
+        entity_id:
+        - timer.bath_fan_timer
+      data: {}
+  mode: single
+- id: '1707812054601'
+  alias: Ванная вытяжка таймаут
+  description: ''
+  trigger:
+  - platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.bath_fan_timer
+  condition: []
+  action:
+  - type: turn_off
+    device_id: d470a7f4ab6ee8f1ddf7b11a472f3b15
+    entity_id: c2fbf8bcb5f90183790bdf17c0728bfd
+    domain: switch
+  mode: single
+- id: '1707814324534'
+  alias: Ванная подсвевтка включено-выключено
+  description: ''
+  trigger:
+  - platform: device
+    type: changed_states
+    device_id: d470a7f4ab6ee8f1ddf7b11a472f3b15
+    entity_id: 7046d99db635195d19cf500d31827368
+    domain: switch
+  condition: []
+  action:
+  - if:
+    - condition: state
+      entity_id: switch.vannaia_vytiazhka_i_podsvetka_left
+      state: 'on'
+    then:
+    - service: timer.start
+      data: {}
+      target:
+        entity_id: timer.bath_timer_backlight
+    else:
+    - service: timer.finish
+      data: {}
+      target:
+        entity_id: timer.bath_timer_backlight
+  mode: single
+- id: '1707814428834'
+  alias: Ванная подсветка таймаут
+  description: ''
+  trigger:
+  - platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.bath_timer_backlight
+  condition: []
+  action:
+  - type: turn_off
+    device_id: d470a7f4ab6ee8f1ddf7b11a472f3b15
+    entity_id: 7046d99db635195d19cf500d31827368
+    domain: switch
+  mode: single
+- id: '1707814556564'
+  alias: Ванная подсветка продление
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.vannaia_dvizhenie_occupancy
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: switch.vannaia_vytiazhka_i_podsvetka_left
+    state: 'on'
+    enabled: true
+  action:
+  - service: timer.start
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - timer.bath_timer_backlight
+  mode: single
+- id: '1707935651610'
+  alias: Ванная диммер нажатие - подсветка
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.vannaia_dimmer_action
+    attribute: action
+    to: single
+  condition: []
+  action:
+  - type: toggle
+    device_id: d470a7f4ab6ee8f1ddf7b11a472f3b15
+    entity_id: 7046d99db635195d19cf500d31827368
+    domain: switch
+  mode: single
+- id: '1707935702757'
+  alias: Ванная диммер 2 нажатия - вытяжка
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.vannaia_dimmer_action
+    attribute: action
+    to: double
+  condition: []
+  action:
+  - type: toggle
+    device_id: d470a7f4ab6ee8f1ddf7b11a472f3b15
+    entity_id: c2fbf8bcb5f90183790bdf17c0728bfd
+    domain: switch
+  mode: single
+- id: '1707935848381'
+  alias: Детская воздух co2
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.vozdukh_detskaia_co2
+    attribute: co2
+  condition:
+  - condition: template
+    value_template: '{{ states(''sensor.vozdukh_detskaia_co2'')|int > 1200 }}'
+  action:
+  - service: notify.ha_notificator_denis
+    data:
+      message: 'Детская CO2: {{ states(''sensor.vozdukh_detskaia_co2'') }}'
+  - wait_template: '{{ states(''sensor.vozdukh_detskaia_co2'')|int < 1000 }}'
+    continue_on_timeout: true
+  - service: notify.ha_notificator_denis
+    data:
+      message: 'Исправлено: детская CO2: {{ states(''sensor.vozdukh_detskaia_co2'')
+        }}'
+  mode: single
+  max_exceeded: silent
